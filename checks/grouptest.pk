@@ -1,0 +1,20 @@
+all {
+    test executable? {
+        path: "/bin/zsh"
+        path2: "/bin/zsh"
+    }
+
+    none {
+        test executable? {
+            path: "/bin/zsh"
+            path2: "/bin/zsh"
+        }
+    }
+
+    any {
+        test executable? {
+            path: "/bin/zsh"
+            path2: "/bin/zsh"
+        }
+    }
+}

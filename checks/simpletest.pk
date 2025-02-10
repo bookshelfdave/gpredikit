@@ -1,0 +1,5 @@
+// is the file /bin/zsh executable?
+test executable? {
+    path: "/bin/zsh"
+    path2: "/bin/zsh"
+}
