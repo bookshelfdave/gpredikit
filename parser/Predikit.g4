@@ -6,9 +6,9 @@ pk_toplevel_child:
     pk_group | pk_test | pk_tool
     ;
 
-pk_group: pk_group_agg
+pk_group: agg_fn=pk_group_agg
         PK_LCURLY
-            pk_group_child+
+            group_children=pk_group_child+
         PK_RCURLY
         ;
 
@@ -21,8 +21,8 @@ pk_group_child:
 pk_group_agg: PK_ALL | PK_ANY | PK_NONE;
 
 pk_test :
-    PK_RETRYING? PK_TEST  PK_NOT? PK_ID PK_LCURLY
-        pk_actual_param+
+    PK_RETRYING? PK_TEST  PK_NOT? testname=PK_ID PK_LCURLY
+        aps+=pk_actual_param+
     PK_RCURLY
     ;
 
@@ -48,7 +48,7 @@ pk_actual_param:
     ;
 
 pk_actual_param_value:
-    PK_INT | PK_STRING_LIT | pk_bool | pk_conversion_fn
+    vi=PK_INT | vs=PK_STRING_LIT | vb=pk_bool | vc=pk_conversion_fn
     ;
 
 pk_tool_actual_param:

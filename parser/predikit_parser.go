@@ -511,10 +511,22 @@ type IPk_groupContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// GetAgg_fn returns the agg_fn rule contexts.
+	GetAgg_fn() IPk_group_aggContext
+
+	// GetGroup_children returns the group_children rule contexts.
+	GetGroup_children() IPk_group_childContext
+
+	// SetAgg_fn sets the agg_fn rule contexts.
+	SetAgg_fn(IPk_group_aggContext)
+
+	// SetGroup_children sets the group_children rule contexts.
+	SetGroup_children(IPk_group_childContext)
+
 	// Getter signatures
-	Pk_group_agg() IPk_group_aggContext
 	PK_LCURLY() antlr.TerminalNode
 	PK_RCURLY() antlr.TerminalNode
+	Pk_group_agg() IPk_group_aggContext
 	AllPk_group_child() []IPk_group_childContext
 	Pk_group_child(i int) IPk_group_childContext
 
@@ -524,7 +536,9 @@ type IPk_groupContext interface {
 
 type Pk_groupContext struct {
 	antlr.BaseParserRuleContext
-	parser antlr.Parser
+	parser         antlr.Parser
+	agg_fn         IPk_group_aggContext
+	group_children IPk_group_childContext
 }
 
 func NewEmptyPk_groupContext() *Pk_groupContext {
@@ -554,6 +568,22 @@ func NewPk_groupContext(parser antlr.Parser, parent antlr.ParserRuleContext, inv
 
 func (s *Pk_groupContext) GetParser() antlr.Parser { return s.parser }
 
+func (s *Pk_groupContext) GetAgg_fn() IPk_group_aggContext { return s.agg_fn }
+
+func (s *Pk_groupContext) GetGroup_children() IPk_group_childContext { return s.group_children }
+
+func (s *Pk_groupContext) SetAgg_fn(v IPk_group_aggContext) { s.agg_fn = v }
+
+func (s *Pk_groupContext) SetGroup_children(v IPk_group_childContext) { s.group_children = v }
+
+func (s *Pk_groupContext) PK_LCURLY() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_LCURLY, 0)
+}
+
+func (s *Pk_groupContext) PK_RCURLY() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_RCURLY, 0)
+}
+
 func (s *Pk_groupContext) Pk_group_agg() IPk_group_aggContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
@@ -568,14 +598,6 @@ func (s *Pk_groupContext) Pk_group_agg() IPk_group_aggContext {
 	}
 
 	return t.(IPk_group_aggContext)
-}
-
-func (s *Pk_groupContext) PK_LCURLY() antlr.TerminalNode {
-	return s.GetToken(PredikitParserPK_LCURLY, 0)
-}
-
-func (s *Pk_groupContext) PK_RCURLY() antlr.TerminalNode {
-	return s.GetToken(PredikitParserPK_RCURLY, 0)
 }
 
 func (s *Pk_groupContext) AllPk_group_child() []IPk_group_childContext {
@@ -647,7 +669,10 @@ func (p *PredikitParser) Pk_group() (localctx IPk_groupContext) {
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(40)
-		p.Pk_group_agg()
+
+		var _x = p.Pk_group_agg()
+
+		localctx.(*Pk_groupContext).agg_fn = _x
 	}
 	{
 		p.SetState(41)
@@ -667,7 +692,10 @@ func (p *PredikitParser) Pk_group() (localctx IPk_groupContext) {
 	for ok := true; ok; ok = ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&33554590) != 0) {
 		{
 			p.SetState(42)
-			p.Pk_group_child()
+
+			var _x = p.Pk_group_child()
+
+			localctx.(*Pk_groupContext).group_children = _x
 		}
 
 		p.SetState(45)
@@ -982,11 +1010,29 @@ type IPk_testContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// GetTestname returns the testname token.
+	GetTestname() antlr.Token
+
+	// SetTestname sets the testname token.
+	SetTestname(antlr.Token)
+
+	// Get_pk_actual_param returns the _pk_actual_param rule contexts.
+	Get_pk_actual_param() IPk_actual_paramContext
+
+	// Set_pk_actual_param sets the _pk_actual_param rule contexts.
+	Set_pk_actual_param(IPk_actual_paramContext)
+
+	// GetAps returns the aps rule context list.
+	GetAps() []IPk_actual_paramContext
+
+	// SetAps sets the aps rule context list.
+	SetAps([]IPk_actual_paramContext)
+
 	// Getter signatures
 	PK_TEST() antlr.TerminalNode
-	PK_ID() antlr.TerminalNode
 	PK_LCURLY() antlr.TerminalNode
 	PK_RCURLY() antlr.TerminalNode
+	PK_ID() antlr.TerminalNode
 	PK_RETRYING() antlr.TerminalNode
 	PK_NOT() antlr.TerminalNode
 	AllPk_actual_param() []IPk_actual_paramContext
@@ -998,7 +1044,10 @@ type IPk_testContext interface {
 
 type Pk_testContext struct {
 	antlr.BaseParserRuleContext
-	parser antlr.Parser
+	parser           antlr.Parser
+	testname         antlr.Token
+	_pk_actual_param IPk_actual_paramContext
+	aps              []IPk_actual_paramContext
 }
 
 func NewEmptyPk_testContext() *Pk_testContext {
@@ -1028,12 +1077,20 @@ func NewPk_testContext(parser antlr.Parser, parent antlr.ParserRuleContext, invo
 
 func (s *Pk_testContext) GetParser() antlr.Parser { return s.parser }
 
+func (s *Pk_testContext) GetTestname() antlr.Token { return s.testname }
+
+func (s *Pk_testContext) SetTestname(v antlr.Token) { s.testname = v }
+
+func (s *Pk_testContext) Get_pk_actual_param() IPk_actual_paramContext { return s._pk_actual_param }
+
+func (s *Pk_testContext) Set_pk_actual_param(v IPk_actual_paramContext) { s._pk_actual_param = v }
+
+func (s *Pk_testContext) GetAps() []IPk_actual_paramContext { return s.aps }
+
+func (s *Pk_testContext) SetAps(v []IPk_actual_paramContext) { s.aps = v }
+
 func (s *Pk_testContext) PK_TEST() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_TEST, 0)
-}
-
-func (s *Pk_testContext) PK_ID() antlr.TerminalNode {
-	return s.GetToken(PredikitParserPK_ID, 0)
 }
 
 func (s *Pk_testContext) PK_LCURLY() antlr.TerminalNode {
@@ -1042,6 +1099,10 @@ func (s *Pk_testContext) PK_LCURLY() antlr.TerminalNode {
 
 func (s *Pk_testContext) PK_RCURLY() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_RCURLY, 0)
+}
+
+func (s *Pk_testContext) PK_ID() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_ID, 0)
 }
 
 func (s *Pk_testContext) PK_RETRYING() antlr.TerminalNode {
@@ -1165,7 +1226,10 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 	}
 	{
 		p.SetState(63)
-		p.Match(PredikitParserPK_ID)
+
+		var _m = p.Match(PredikitParserPK_ID)
+
+		localctx.(*Pk_testContext).testname = _m
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -1189,8 +1253,12 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 	for ok := true; ok; ok = _la == PredikitParserPK_ID {
 		{
 			p.SetState(65)
-			p.Pk_actual_param()
+
+			var _x = p.Pk_actual_param()
+
+			localctx.(*Pk_testContext)._pk_actual_param = _x
 		}
+		localctx.(*Pk_testContext).aps = append(localctx.(*Pk_testContext).aps, localctx.(*Pk_testContext)._pk_actual_param)
 
 		p.SetState(68)
 		p.GetErrorHandler().Sync(p)
@@ -1955,6 +2023,30 @@ type IPk_actual_param_valueContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// GetVi returns the vi token.
+	GetVi() antlr.Token
+
+	// GetVs returns the vs token.
+	GetVs() antlr.Token
+
+	// SetVi sets the vi token.
+	SetVi(antlr.Token)
+
+	// SetVs sets the vs token.
+	SetVs(antlr.Token)
+
+	// GetVb returns the vb rule contexts.
+	GetVb() IPk_boolContext
+
+	// GetVc returns the vc rule contexts.
+	GetVc() IPk_conversion_fnContext
+
+	// SetVb sets the vb rule contexts.
+	SetVb(IPk_boolContext)
+
+	// SetVc sets the vc rule contexts.
+	SetVc(IPk_conversion_fnContext)
+
 	// Getter signatures
 	PK_INT() antlr.TerminalNode
 	PK_STRING_LIT() antlr.TerminalNode
@@ -1968,6 +2060,10 @@ type IPk_actual_param_valueContext interface {
 type Pk_actual_param_valueContext struct {
 	antlr.BaseParserRuleContext
 	parser antlr.Parser
+	vi     antlr.Token
+	vs     antlr.Token
+	vb     IPk_boolContext
+	vc     IPk_conversion_fnContext
 }
 
 func NewEmptyPk_actual_param_valueContext() *Pk_actual_param_valueContext {
@@ -1996,6 +2092,22 @@ func NewPk_actual_param_valueContext(parser antlr.Parser, parent antlr.ParserRul
 }
 
 func (s *Pk_actual_param_valueContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Pk_actual_param_valueContext) GetVi() antlr.Token { return s.vi }
+
+func (s *Pk_actual_param_valueContext) GetVs() antlr.Token { return s.vs }
+
+func (s *Pk_actual_param_valueContext) SetVi(v antlr.Token) { s.vi = v }
+
+func (s *Pk_actual_param_valueContext) SetVs(v antlr.Token) { s.vs = v }
+
+func (s *Pk_actual_param_valueContext) GetVb() IPk_boolContext { return s.vb }
+
+func (s *Pk_actual_param_valueContext) GetVc() IPk_conversion_fnContext { return s.vc }
+
+func (s *Pk_actual_param_valueContext) SetVb(v IPk_boolContext) { s.vb = v }
+
+func (s *Pk_actual_param_valueContext) SetVc(v IPk_conversion_fnContext) { s.vc = v }
 
 func (s *Pk_actual_param_valueContext) PK_INT() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_INT, 0)
@@ -2071,7 +2183,10 @@ func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valu
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(100)
-			p.Match(PredikitParserPK_INT)
+
+			var _m = p.Match(PredikitParserPK_INT)
+
+			localctx.(*Pk_actual_param_valueContext).vi = _m
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -2082,7 +2197,10 @@ func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valu
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(101)
-			p.Match(PredikitParserPK_STRING_LIT)
+
+			var _m = p.Match(PredikitParserPK_STRING_LIT)
+
+			localctx.(*Pk_actual_param_valueContext).vs = _m
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -2093,14 +2211,20 @@ func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valu
 		p.EnterOuterAlt(localctx, 3)
 		{
 			p.SetState(102)
-			p.Pk_bool()
+
+			var _x = p.Pk_bool()
+
+			localctx.(*Pk_actual_param_valueContext).vb = _x
 		}
 
 	case PredikitParserPK_ID:
 		p.EnterOuterAlt(localctx, 4)
 		{
 			p.SetState(103)
-			p.Pk_conversion_fn()
+
+			var _x = p.Pk_conversion_fn()
+
+			localctx.(*Pk_actual_param_valueContext).vc = _x
 		}
 
 	default:

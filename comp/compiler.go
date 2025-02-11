@@ -2,99 +2,134 @@ package comp
 
 import (
 	"fmt"
-
-	//"github.com/bookshelfdave/gpredikit/parser"
+	"strconv"
 
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/bookshelfdave/gpredikit/parser"
 )
 
+type ParseTreeProperty = map[any]any
+
 type TreeShapeListener struct {
 	*parser.BasePredikitListener
+	TreeProps ParseTreeProperty
 }
 
 func NewTreeShapeListener() *TreeShapeListener {
-	return new(TreeShapeListener)
+	return &TreeShapeListener{TreeProps: make(map[any]any)}
 }
 
-// func (this *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
+// func (thitsl *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 // 	fmt.Println(ctx.GetText())
 // }
 
-// VisitTerminal is called when a terminal node is visited.
-// func (s *TreeShapeListener) VisitTerminal(node antlr.TerminalNode) {}
+// VisitTerminal itsl called when a terminal node itsl visited.
+// func (tsl *TreeShapeListener) VisitTerminal(node antlr.TerminalNode) {}
 
-// // VisitErrorNode is called when an error node is visited.
-// func (s *TreeShapeListener) VisitErrorNode(node antlr.ErrorNode) {}
+// // VisitErrorNode itsl called when an error node itsl visited.
+// func (tsl *TreeShapeListener) VisitErrorNode(node antlr.ErrorNode) {}
 
-// // EnterEveryRule is called when any rule is entered.
-// func (s *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {}
+// // EnterEveryRule itsl called when any rule itsl entered.
+// func (tsl *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {}
 
-// // ExitEveryRule is called when any rule is exited.
-// func (s *TreeShapeListener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
+// // ExitEveryRule itsl called when any rule itsl exited.
+// func (tsl *TreeShapeListener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
-// EnterPk_toplevel is called when production pk_toplevel is entered.
-func (s *TreeShapeListener) EnterPk_toplevel(ctx *parser.Pk_toplevelContext) {
+// EnterPk_toplevel itsl called when production pk_toplevel itsl entered.
+func (tsl *TreeShapeListener) EnterPk_toplevel(ctx *parser.Pk_toplevelContext) {
 	fmt.Println("Enter toplevel")
 
 }
 
-// ExitPk_toplevel is called when production pk_toplevel is exited.
-func (s *TreeShapeListener) ExitPk_toplevel(ctx *parser.Pk_toplevelContext) {
+// ExitPk_toplevel itsl called when production pk_toplevel itsl exited.
+func (tsl *TreeShapeListener) ExitPk_toplevel(ctx *parser.Pk_toplevelContext) {
 	fmt.Println("Exit toplevel")
 }
 
-// func (s *TreeShapeListener) EnterPk_toplevel_child(ctx *parser.Pk_toplevel_childContext) {}
+// func (tsl *TreeShapeListener) ExitPk_toplevel_child(ctx *parser.Pk_toplevel_childContext) {}
 
-// func (s *TreeShapeListener) ExitPk_toplevel_child(ctx *parser.Pk_toplevel_childContext) {}
-
-func (s *TreeShapeListener) EnterPk_group(ctx *parser.Pk_groupContext) {
-	fmt.Println("Enter group")
+func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
+	agg_fn := ctx.GetAgg_fn().GetText()
+	fmt.Printf("AGG FN = [%s]\n", agg_fn)
+	_ = ctx.GetGroup_children()
 }
 
-func (s *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
-	fmt.Println("Exit group")
+func (tsl *TreeShapeListener) ExitPk_group_child(ctx *parser.Pk_group_childContext) {
+	// test | group | actual_param
 }
 
-// func (s *TreeShapeListener) EnterPk_group_child(ctx *parser.Pk_group_childContext) {}
+// func (tsl *TreeShapeListener) ExitPk_group_agg(ctx *parser.Pk_group_aggContext) {}
 
-// func (s *TreeShapeListener) ExitPk_group_child(ctx *parser.Pk_group_childContext) {}
+func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
+	aps := ctx.GetAps()
+	actualParams := make([]*ActualParam, len(aps))
+	for _, ap := range aps {
+		v := tsl.TreeProps[ap]
+		app := v.(*ActualParam)
+		actualParams = append(actualParams, app)
+	}
 
-// func (s *TreeShapeListener) EnterPk_group_agg(ctx *parser.Pk_group_aggContext) {}
-
-// func (s *TreeShapeListener) ExitPk_group_agg(ctx *parser.Pk_group_aggContext) {}
-
-func (s *TreeShapeListener) EnterPk_test(ctx *parser.Pk_testContext) {
-	fmt.Println("Enter test")
+	fnname := ctx.GetTestname().GetText()
+	is_negated := ctx.PK_NOT() != nil
+	is_retrying := ctx.PK_RETRYING() != nil
+	is_group := false
+	cd := AstCheckDef{
+		FnName:         fnname,
+		ActualParams:   actualParams,
+		Children:       []*AstCheckDef{},
+		ContentAddress: "",
+		IsNegated:      is_negated,
+		IsRetrying:     is_retrying,
+		IsGroup:        is_group,
+	}
+	fmt.Printf("\nCheck %+v\n", cd)
+	tsl.TreeProps[ctx] = cd
 }
 
-func (s *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
-	fmt.Println("Exit test")
+// func (tsl *TreeShapeListener) ExitPk_tool(ctx *parser.Pk_toolContext) {}
+
+// func (tsl *TreeShapeListener) ExitPk_tool_child(ctx *parser.Pk_tool_childContext) {}
+
+// func (tsl *TreeShapeListener) ExitPk_tool_metaparam(ctx *parser.Pk_tool_metaparamContext) {}
+
+func (tsl *TreeShapeListener) ExitPk_actual_param(ctx *parser.Pk_actual_paramContext) {
+	fmt.Printf("%s => %s", ctx.GetParam_name().GetText(), ctx.GetParam_value().GetText())
+
+	v := tsl.TreeProps[ctx.Pk_actual_param_value()].(*ActualParam)
+	v.Name = ctx.GetParam_name().GetText()
+
+	tsl.TreeProps[ctx] = v
 }
 
-// func (s *TreeShapeListener) EnterPk_tool(ctx *parser.Pk_toolContext) {}
+func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_param_valueContext) {
+	var retval *ActualParam
+	if ctx.GetVs() != nil {
+		// String will alwaytsl come from Antlr with double quotetsl on each end
+		v := StripFirstAndLast(ctx.GetVs().GetText())
+		retval = NewUnnamedParamString(v)
 
-// func (s *TreeShapeListener) ExitPk_tool(ctx *parser.Pk_toolContext) {}
+	} else if ctx.GetVi() != nil {
+		v, err := strconv.Atoi(ctx.GetVi().GetText())
+		if err != nil {
+			// TODO add these to a list of compile errors
+			panic("Cannot parse number")
+		}
+		retval = NewUnnamedParamInt(v)
+	} else if ctx.GetVb() != nil {
+		v, err := strconv.ParseBool(ctx.GetVb().GetText())
+		if err != nil {
+			// TODO add these to a list of compile errors
+			panic("Cannot parse bool")
+		}
+		retval = NewUnnamedParamBool(v)
+	} else if ctx.GetVc() != nil {
+		// NOT IMPLEMENTED, THItsl JUST RETURNtsl THE ENTIRE STRING
+		retval = NewUnnamedParamString(ctx.GetVc().GetText())
+	}
+	tsl.TreeProps[ctx] = retval
+}
 
-// func (s *TreeShapeListener) EnterPk_tool_child(ctx *parser.Pk_tool_childContext) {}
-
-// func (s *TreeShapeListener) ExitPk_tool_child(ctx *parser.Pk_tool_childContext) {}
-
-// func (s *TreeShapeListener) EnterPk_tool_metaparam(ctx *parser.Pk_tool_metaparamContext) {}
-
-// func (s *TreeShapeListener) ExitPk_tool_metaparam(ctx *parser.Pk_tool_metaparamContext) {}
-
-// func (s *TreeShapeListener) EnterPk_actual_param(ctx *parser.Pk_actual_paramContext) {}
-
-// func (s *TreeShapeListener) ExitPk_actual_param(ctx *parser.Pk_actual_paramContext) {}
-
-// func (s *TreeShapeListener) EnterPk_actual_param_value(ctx *parser.Pk_actual_param_valueContext) {}
-
-// func (s *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_param_valueContext) {}
-
-// func (s *TreeShapeListener) EnterPk_bool(ctx *parser.Pk_boolContext) {}
-
-// func (s *TreeShapeListener) ExitPk_bool(ctx *parser.Pk_boolContext) {}
+// func (tsl *TreeShapeListener) ExitPk_bool(ctx *parser.Pk_boolContext) {}
 
 func Run() {
 	fmt.Println("Compiling...")

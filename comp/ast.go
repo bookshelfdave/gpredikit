@@ -13,8 +13,8 @@ type ContentAddress struct {
 
 type AstCheckDef struct {
 	FnName         string
-	ActualParams   string
-	Children       []AstCheckDef
+	ActualParams   []*ActualParam
+	Children       []*AstCheckDef
 	ContentAddress string
 
 	IsNegated  bool
