@@ -23,25 +23,16 @@ func NewTreeShapeListener() *TreeShapeListener {
 // 	fmt.Println(ctx.GetText())
 // }
 
-// VisitTerminal itsl called when a terminal node itsl visited.
 // func (tsl *TreeShapeListener) VisitTerminal(node antlr.TerminalNode) {}
-
-// // VisitErrorNode itsl called when an error node itsl visited.
 // func (tsl *TreeShapeListener) VisitErrorNode(node antlr.ErrorNode) {}
-
-// // EnterEveryRule itsl called when any rule itsl entered.
 // func (tsl *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {}
-
-// // ExitEveryRule itsl called when any rule itsl exited.
 // func (tsl *TreeShapeListener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
-// EnterPk_toplevel itsl called when production pk_toplevel itsl entered.
 func (tsl *TreeShapeListener) EnterPk_toplevel(ctx *parser.Pk_toplevelContext) {
 	fmt.Println("Enter toplevel")
 
 }
 
-// ExitPk_toplevel itsl called when production pk_toplevel itsl exited.
 func (tsl *TreeShapeListener) ExitPk_toplevel(ctx *parser.Pk_toplevelContext) {
 	fmt.Println("Exit toplevel")
 }
