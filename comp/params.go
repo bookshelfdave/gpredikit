@@ -7,32 +7,38 @@ const (
 	ParamTypeInt      = "Int"
 	ParamTypeBool     = "Bool"
 	ParamTypeDuration = "Duration"
+	ParamTypeTypeName = "TypeName"
 )
 
 type ActualParam struct {
 	Name      string
 	ParamType string
 
-	s *string
-	i *int
-	b *bool
-	d *int64
+	s       *string
+	i       *int
+	b       *bool
+	d       *int64
+	Address ContentAddress
 }
 
-func NewUnnamedParamString(news string) *ActualParam {
-	return &ActualParam{s: &news, ParamType: ParamTypeString}
+func NewUnnamedParamString(newS string) *ActualParam {
+	return &ActualParam{s: &newS, ParamType: ParamTypeString}
 }
 
-func NewUnnamedParamInt(newi int) *ActualParam {
-	return &ActualParam{i: &newi, ParamType: ParamTypeInt}
+func NewUnnamedParamInt(newI int) *ActualParam {
+	return &ActualParam{i: &newI, ParamType: ParamTypeInt}
 }
 
-func NewUnnamedParamBool(newb bool) *ActualParam {
-	return &ActualParam{b: &newb, ParamType: ParamTypeBool}
+func NewUnnamedParamBool(newB bool) *ActualParam {
+	return &ActualParam{b: &newB, ParamType: ParamTypeBool}
 }
 
-func NewUnnamedParamDuration(newd int64) *ActualParam {
-	return &ActualParam{d: &newd, ParamType: ParamTypeDuration}
+func NewUnnamedParamDuration(newD int64) *ActualParam {
+	return &ActualParam{d: &newD, ParamType: ParamTypeDuration}
+}
+
+func NewUnnamedParamTypeName(newS string) *ActualParam {
+	return &ActualParam{s: &newS, ParamType: ParamTypeTypeName}
 }
 
 func (ap *ActualParam) GetString() (string, error) {
@@ -66,14 +72,16 @@ func (ap *ActualParam) GetDuration() (int64, error) {
 func (ap *ActualParam) String() string {
 	switch ap.ParamType {
 	case ParamTypeString:
-		return fmt.Sprintf("String(%s)", *ap.s)
+		return fmt.Sprintf("%s: String(%s) Address(%v)", ap.Name, *ap.s, ap.Address)
 	case ParamTypeInt:
-		return fmt.Sprintf("Int(%d)", *ap.i)
+		return fmt.Sprintf("%s: Int(%d) Address(%v)", ap.Name, *ap.i, ap.Address)
 	case ParamTypeBool:
-		return fmt.Sprintf("Bool(%t)", *ap.b)
+		return fmt.Sprintf("%s: Bool(%t) Address(%v)", ap.Name, *ap.b, ap.Address)
 	case ParamTypeDuration:
-		return fmt.Sprintf("Duration(%d)", *ap.d)
+		return fmt.Sprintf("%s: Duration(%d) Address(%v)", ap.Name, *ap.d, ap.Address)
+	case ParamTypeTypeName:
+		return fmt.Sprintf("%s: TypeName(%s) Address(%v)", ap.Name, *ap.s, ap.Address)
 	default:
-		return fmt.Sprintf("<unknown param type %s>", ap.ParamType)
+		return fmt.Sprintf("%s: <unknown param type %s> Address(%v)", ap.Name, ap.ParamType, ap.Address)
 	}
 }

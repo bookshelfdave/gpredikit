@@ -1428,6 +1428,18 @@ type IPk_toolContext interface {
 	// SetTool_name sets the tool_name token.
 	SetTool_name(antlr.Token)
 
+	// Get_pk_tool_child returns the _pk_tool_child rule contexts.
+	Get_pk_tool_child() IPk_tool_childContext
+
+	// Set_pk_tool_child sets the _pk_tool_child rule contexts.
+	Set_pk_tool_child(IPk_tool_childContext)
+
+	// GetKids returns the kids rule context list.
+	GetKids() []IPk_tool_childContext
+
+	// SetKids sets the kids rule context list.
+	SetKids([]IPk_tool_childContext)
+
 	// Getter signatures
 	PK_TOOL() antlr.TerminalNode
 	PK_LCURLY() antlr.TerminalNode
@@ -1442,8 +1454,10 @@ type IPk_toolContext interface {
 
 type Pk_toolContext struct {
 	antlr.BaseParserRuleContext
-	parser    antlr.Parser
-	tool_name antlr.Token
+	parser         antlr.Parser
+	tool_name      antlr.Token
+	_pk_tool_child IPk_tool_childContext
+	kids           []IPk_tool_childContext
 }
 
 func NewEmptyPk_toolContext() *Pk_toolContext {
@@ -1476,6 +1490,14 @@ func (s *Pk_toolContext) GetParser() antlr.Parser { return s.parser }
 func (s *Pk_toolContext) GetTool_name() antlr.Token { return s.tool_name }
 
 func (s *Pk_toolContext) SetTool_name(v antlr.Token) { s.tool_name = v }
+
+func (s *Pk_toolContext) Get_pk_tool_child() IPk_tool_childContext { return s._pk_tool_child }
+
+func (s *Pk_toolContext) Set_pk_tool_child(v IPk_tool_childContext) { s._pk_tool_child = v }
+
+func (s *Pk_toolContext) GetKids() []IPk_tool_childContext { return s.kids }
+
+func (s *Pk_toolContext) SetKids(v []IPk_tool_childContext) { s.kids = v }
 
 func (s *Pk_toolContext) PK_TOOL() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_TOOL, 0)
@@ -1597,8 +1619,12 @@ func (p *PredikitParser) Pk_tool() (localctx IPk_toolContext) {
 	for ok := true; ok; ok = _la == PredikitParserPK_DOLLAR || _la == PredikitParserPK_ID {
 		{
 			p.SetState(75)
-			p.Pk_tool_child()
+
+			var _x = p.Pk_tool_child()
+
+			localctx.(*Pk_toolContext)._pk_tool_child = _x
 		}
+		localctx.(*Pk_toolContext).kids = append(localctx.(*Pk_toolContext).kids, localctx.(*Pk_toolContext)._pk_tool_child)
 
 		p.SetState(78)
 		p.GetErrorHandler().Sync(p)
@@ -1777,11 +1803,23 @@ type IPk_tool_metaparamContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetToolname returns the toolname token.
-	GetToolname() antlr.Token
+	// GetTool_param_name returns the tool_param_name token.
+	GetTool_param_name() antlr.Token
 
-	// SetToolname sets the toolname token.
-	SetToolname(antlr.Token)
+	// SetTool_param_name sets the tool_param_name token.
+	SetTool_param_name(antlr.Token)
+
+	// Get_pk_tool_actual_param returns the _pk_tool_actual_param rule contexts.
+	Get_pk_tool_actual_param() IPk_tool_actual_paramContext
+
+	// Set_pk_tool_actual_param sets the _pk_tool_actual_param rule contexts.
+	Set_pk_tool_actual_param(IPk_tool_actual_paramContext)
+
+	// GetTool_actual_params returns the tool_actual_params rule context list.
+	GetTool_actual_params() []IPk_tool_actual_paramContext
+
+	// SetTool_actual_params sets the tool_actual_params rule context list.
+	SetTool_actual_params([]IPk_tool_actual_paramContext)
 
 	// Getter signatures
 	PK_DOLLAR() antlr.TerminalNode
@@ -1797,8 +1835,10 @@ type IPk_tool_metaparamContext interface {
 
 type Pk_tool_metaparamContext struct {
 	antlr.BaseParserRuleContext
-	parser   antlr.Parser
-	toolname antlr.Token
+	parser                antlr.Parser
+	tool_param_name       antlr.Token
+	_pk_tool_actual_param IPk_tool_actual_paramContext
+	tool_actual_params    []IPk_tool_actual_paramContext
 }
 
 func NewEmptyPk_tool_metaparamContext() *Pk_tool_metaparamContext {
@@ -1828,9 +1868,25 @@ func NewPk_tool_metaparamContext(parser antlr.Parser, parent antlr.ParserRuleCon
 
 func (s *Pk_tool_metaparamContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *Pk_tool_metaparamContext) GetToolname() antlr.Token { return s.toolname }
+func (s *Pk_tool_metaparamContext) GetTool_param_name() antlr.Token { return s.tool_param_name }
 
-func (s *Pk_tool_metaparamContext) SetToolname(v antlr.Token) { s.toolname = v }
+func (s *Pk_tool_metaparamContext) SetTool_param_name(v antlr.Token) { s.tool_param_name = v }
+
+func (s *Pk_tool_metaparamContext) Get_pk_tool_actual_param() IPk_tool_actual_paramContext {
+	return s._pk_tool_actual_param
+}
+
+func (s *Pk_tool_metaparamContext) Set_pk_tool_actual_param(v IPk_tool_actual_paramContext) {
+	s._pk_tool_actual_param = v
+}
+
+func (s *Pk_tool_metaparamContext) GetTool_actual_params() []IPk_tool_actual_paramContext {
+	return s.tool_actual_params
+}
+
+func (s *Pk_tool_metaparamContext) SetTool_actual_params(v []IPk_tool_actual_paramContext) {
+	s.tool_actual_params = v
+}
 
 func (s *Pk_tool_metaparamContext) PK_DOLLAR() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_DOLLAR, 0)
@@ -1928,7 +1984,7 @@ func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext
 
 		var _m = p.Match(PredikitParserPK_ID)
 
-		localctx.(*Pk_tool_metaparamContext).toolname = _m
+		localctx.(*Pk_tool_metaparamContext).tool_param_name = _m
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -1952,8 +2008,12 @@ func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext
 	for ok := true; ok; ok = _la == PredikitParserPK_ID {
 		{
 			p.SetState(89)
-			p.Pk_tool_actual_param()
+
+			var _x = p.Pk_tool_actual_param()
+
+			localctx.(*Pk_tool_metaparamContext)._pk_tool_actual_param = _x
 		}
+		localctx.(*Pk_tool_metaparamContext).tool_actual_params = append(localctx.(*Pk_tool_metaparamContext).tool_actual_params, localctx.(*Pk_tool_metaparamContext)._pk_tool_actual_param)
 
 		p.SetState(92)
 		p.GetErrorHandler().Sync(p)
@@ -2540,6 +2600,36 @@ type IPk_tool_actual_param_valueContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// GetVi returns the vi token.
+	GetVi() antlr.Token
+
+	// GetVs returns the vs token.
+	GetVs() antlr.Token
+
+	// GetVtn returns the vtn token.
+	GetVtn() antlr.Token
+
+	// SetVi sets the vi token.
+	SetVi(antlr.Token)
+
+	// SetVs sets the vs token.
+	SetVs(antlr.Token)
+
+	// SetVtn sets the vtn token.
+	SetVtn(antlr.Token)
+
+	// GetVb returns the vb rule contexts.
+	GetVb() IPk_boolContext
+
+	// GetVc returns the vc rule contexts.
+	GetVc() IPk_conversion_fnContext
+
+	// SetVb sets the vb rule contexts.
+	SetVb(IPk_boolContext)
+
+	// SetVc sets the vc rule contexts.
+	SetVc(IPk_conversion_fnContext)
+
 	// Getter signatures
 	PK_INT() antlr.TerminalNode
 	PK_STRING_LIT() antlr.TerminalNode
@@ -2554,6 +2644,11 @@ type IPk_tool_actual_param_valueContext interface {
 type Pk_tool_actual_param_valueContext struct {
 	antlr.BaseParserRuleContext
 	parser antlr.Parser
+	vi     antlr.Token
+	vs     antlr.Token
+	vb     IPk_boolContext
+	vc     IPk_conversion_fnContext
+	vtn    antlr.Token
 }
 
 func NewEmptyPk_tool_actual_param_valueContext() *Pk_tool_actual_param_valueContext {
@@ -2582,6 +2677,26 @@ func NewPk_tool_actual_param_valueContext(parser antlr.Parser, parent antlr.Pars
 }
 
 func (s *Pk_tool_actual_param_valueContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Pk_tool_actual_param_valueContext) GetVi() antlr.Token { return s.vi }
+
+func (s *Pk_tool_actual_param_valueContext) GetVs() antlr.Token { return s.vs }
+
+func (s *Pk_tool_actual_param_valueContext) GetVtn() antlr.Token { return s.vtn }
+
+func (s *Pk_tool_actual_param_valueContext) SetVi(v antlr.Token) { s.vi = v }
+
+func (s *Pk_tool_actual_param_valueContext) SetVs(v antlr.Token) { s.vs = v }
+
+func (s *Pk_tool_actual_param_valueContext) SetVtn(v antlr.Token) { s.vtn = v }
+
+func (s *Pk_tool_actual_param_valueContext) GetVb() IPk_boolContext { return s.vb }
+
+func (s *Pk_tool_actual_param_valueContext) GetVc() IPk_conversion_fnContext { return s.vc }
+
+func (s *Pk_tool_actual_param_valueContext) SetVb(v IPk_boolContext) { s.vb = v }
+
+func (s *Pk_tool_actual_param_valueContext) SetVc(v IPk_conversion_fnContext) { s.vc = v }
 
 func (s *Pk_tool_actual_param_valueContext) PK_INT() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_INT, 0)
@@ -2661,7 +2776,10 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(110)
-			p.Match(PredikitParserPK_INT)
+
+			var _m = p.Match(PredikitParserPK_INT)
+
+			localctx.(*Pk_tool_actual_param_valueContext).vi = _m
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -2672,7 +2790,10 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(111)
-			p.Match(PredikitParserPK_STRING_LIT)
+
+			var _m = p.Match(PredikitParserPK_STRING_LIT)
+
+			localctx.(*Pk_tool_actual_param_valueContext).vs = _m
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
@@ -2683,21 +2804,30 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 		p.EnterOuterAlt(localctx, 3)
 		{
 			p.SetState(112)
-			p.Pk_bool()
+
+			var _x = p.Pk_bool()
+
+			localctx.(*Pk_tool_actual_param_valueContext).vb = _x
 		}
 
 	case PredikitParserPK_ID:
 		p.EnterOuterAlt(localctx, 4)
 		{
 			p.SetState(113)
-			p.Pk_conversion_fn()
+
+			var _x = p.Pk_conversion_fn()
+
+			localctx.(*Pk_tool_actual_param_valueContext).vc = _x
 		}
 
 	case PredikitParserPK_TYPENAME:
 		p.EnterOuterAlt(localctx, 5)
 		{
 			p.SetState(114)
-			p.Match(PredikitParserPK_TYPENAME)
+
+			var _m = p.Match(PredikitParserPK_TYPENAME)
+
+			localctx.(*Pk_tool_actual_param_valueContext).vtn = _m
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit

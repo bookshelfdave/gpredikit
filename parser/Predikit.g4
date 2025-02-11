@@ -27,7 +27,7 @@ pk_test :
     ;
 
 pk_tool: PK_TOOL tool_name=PK_ID PK_LCURLY
-            pk_tool_child+
+            kids+=pk_tool_child+
          PK_RCURLY
          ;
 
@@ -38,8 +38,8 @@ pk_tool_child:
     ;
 
 pk_tool_metaparam:
-    PK_DOLLAR toolname=PK_ID PK_LCURLY
-        pk_tool_actual_param+
+    PK_DOLLAR tool_param_name=PK_ID PK_LCURLY
+        tool_actual_params+=pk_tool_actual_param+
     PK_RCURLY
     ;
 
@@ -56,7 +56,7 @@ pk_tool_actual_param:
     ;
 
 pk_tool_actual_param_value:
-    PK_INT | PK_STRING_LIT | pk_bool | pk_conversion_fn | PK_TYPENAME
+    vi=PK_INT | vs=PK_STRING_LIT | vb=pk_bool | vc=pk_conversion_fn | vtn=PK_TYPENAME
     ;
 
 pk_conversion_fn: PK_ID
