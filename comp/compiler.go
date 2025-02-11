@@ -6,6 +6,7 @@ import (
 
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/bookshelfdave/gpredikit/parser"
+	//"golang.org/x/exp/slices"
 )
 
 type ParseTreeProperty = map[any]any
@@ -19,7 +20,7 @@ func NewTreeShapeListener() *TreeShapeListener {
 	return &TreeShapeListener{TreeProps: make(map[any]any)}
 }
 
-// func (thitsl *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
+// func (tsl *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 // 	fmt.Println(ctx.GetText())
 // }
 
@@ -28,25 +29,73 @@ func NewTreeShapeListener() *TreeShapeListener {
 // func (tsl *TreeShapeListener) EnterEveryRule(ctx antlr.ParserRuleContext) {}
 // func (tsl *TreeShapeListener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
-func (tsl *TreeShapeListener) EnterPk_toplevel(ctx *parser.Pk_toplevelContext) {
-	fmt.Println("Enter toplevel")
-
-}
-
 func (tsl *TreeShapeListener) ExitPk_toplevel(ctx *parser.Pk_toplevelContext) {
-	fmt.Println("Exit toplevel")
+	// Children is already a method in Antlr
+	for _, child := range ctx.GetKids() {
+		v := tsl.TreeProps[child]
+		fmt.Printf("CHILD %+v\n", v)
+	}
 }
 
-// func (tsl *TreeShapeListener) ExitPk_toplevel_child(ctx *parser.Pk_toplevel_childContext) {}
+func (tsl *TreeShapeListener) ExitPk_toplevel_child(ctx *parser.Pk_toplevel_childContext) {
+	if ctx.GetTest() != nil {
+		tsl.TreeProps[ctx] = tsl.TreeProps[ctx.GetTest()]
+	} else if ctx.GetGroup() != nil {
+		tsl.TreeProps[ctx] = tsl.TreeProps[ctx.GetGroup()]
+	} else if ctx.GetTool() != nil {
+		tsl.TreeProps[ctx] = tsl.TreeProps[ctx.GetTool()]
+	}
+}
 
 func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
 	agg_fn := ctx.GetAgg_fn().GetText()
 	fmt.Printf("AGG FN = [%s]\n", agg_fn)
-	_ = ctx.GetGroup_children()
+
+	actualParams := make([]*ActualParam, 0)
+	children := make([]*AstCheckDef, 0)
+	gcs := ctx.GetGroup_children()
+
+	for _, gc := range gcs {
+		v := tsl.TreeProps[gc]
+		switch v.(type) {
+		case *AstCheckDef:
+			fmt.Printf("Found a check! %+v\n", v)
+			cd := v.(*AstCheckDef)
+			children = append(children, cd)
+		case *ActualParam:
+			app := v.(*ActualParam)
+			actualParams = append(actualParams, app)
+			fmt.Printf("Found a param! %+v\n", v)
+		default:
+			fmt.Printf("Found something else! %+v\n", v)
+			panic("Found something else")
+		}
+	}
+
+	fnname := agg_fn
+	is_negated := false
+	is_retrying := false
+	is_group := true
+	cd := &AstCheckDef{
+		FnName:         fnname,
+		ActualParams:   actualParams,
+		Children:       children,
+		ContentAddress: "",
+		IsNegated:      is_negated,
+		IsRetrying:     is_retrying,
+		IsGroup:        is_group,
+	}
+	tsl.TreeProps[ctx] = cd
 }
 
 func (tsl *TreeShapeListener) ExitPk_group_child(ctx *parser.Pk_group_childContext) {
-	// test | group | actual_param
+	if ctx.GetTest() != nil {
+		tsl.TreeProps[ctx] = tsl.TreeProps[ctx.GetTest()]
+	} else if ctx.GetGroup() != nil {
+		tsl.TreeProps[ctx] = tsl.TreeProps[ctx.GetGroup()]
+	} else if ctx.GetActual_param() != nil {
+		tsl.TreeProps[ctx] = tsl.TreeProps[ctx.GetActual_param()]
+	}
 }
 
 // func (tsl *TreeShapeListener) ExitPk_group_agg(ctx *parser.Pk_group_aggContext) {}
@@ -64,7 +113,7 @@ func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 	is_negated := ctx.PK_NOT() != nil
 	is_retrying := ctx.PK_RETRYING() != nil
 	is_group := false
-	cd := AstCheckDef{
+	cd := &AstCheckDef{
 		FnName:         fnname,
 		ActualParams:   actualParams,
 		Children:       []*AstCheckDef{},
@@ -114,7 +163,7 @@ func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_pa
 		}
 		retval = NewUnnamedParamBool(v)
 	} else if ctx.GetVc() != nil {
-		// NOT IMPLEMENTED, THItsl JUST RETURNtsl THE ENTIRE STRING
+		// NOT IMPLEMENTED, THIS JUST RETURNS THE ENTIRE STRING
 		retval = NewUnnamedParamString(ctx.GetVc().GetText())
 	}
 	tsl.TreeProps[ctx] = retval

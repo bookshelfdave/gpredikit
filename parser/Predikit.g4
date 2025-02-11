@@ -1,21 +1,21 @@
 grammar Predikit;
 
-pk_toplevel: pk_toplevel_child+;
+pk_toplevel: kids+=pk_toplevel_child+;
 
 pk_toplevel_child:
-    pk_group | pk_test | pk_tool
+    group=pk_group | test=pk_test | tool=pk_tool
     ;
 
 pk_group: agg_fn=pk_group_agg
         PK_LCURLY
-            group_children=pk_group_child+
+            group_children+=pk_group_child+
         PK_RCURLY
         ;
 
 pk_group_child:
-    pk_test |
-    pk_group | // nested children
-    pk_actual_param // params for the group
+    test=pk_test |
+    group=pk_group | // nested children
+    actual_param=pk_actual_param // params for the group
     ;
 
 pk_group_agg: PK_ALL | PK_ANY | PK_NONE;

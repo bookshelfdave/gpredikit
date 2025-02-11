@@ -198,6 +198,18 @@ type IPk_toplevelContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// Get_pk_toplevel_child returns the _pk_toplevel_child rule contexts.
+	Get_pk_toplevel_child() IPk_toplevel_childContext
+
+	// Set_pk_toplevel_child sets the _pk_toplevel_child rule contexts.
+	Set_pk_toplevel_child(IPk_toplevel_childContext)
+
+	// GetKids returns the kids rule context list.
+	GetKids() []IPk_toplevel_childContext
+
+	// SetKids sets the kids rule context list.
+	SetKids([]IPk_toplevel_childContext)
+
 	// Getter signatures
 	AllPk_toplevel_child() []IPk_toplevel_childContext
 	Pk_toplevel_child(i int) IPk_toplevel_childContext
@@ -208,7 +220,9 @@ type IPk_toplevelContext interface {
 
 type Pk_toplevelContext struct {
 	antlr.BaseParserRuleContext
-	parser antlr.Parser
+	parser             antlr.Parser
+	_pk_toplevel_child IPk_toplevel_childContext
+	kids               []IPk_toplevel_childContext
 }
 
 func NewEmptyPk_toplevelContext() *Pk_toplevelContext {
@@ -237,6 +251,18 @@ func NewPk_toplevelContext(parser antlr.Parser, parent antlr.ParserRuleContext, 
 }
 
 func (s *Pk_toplevelContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Pk_toplevelContext) Get_pk_toplevel_child() IPk_toplevel_childContext {
+	return s._pk_toplevel_child
+}
+
+func (s *Pk_toplevelContext) Set_pk_toplevel_child(v IPk_toplevel_childContext) {
+	s._pk_toplevel_child = v
+}
+
+func (s *Pk_toplevelContext) GetKids() []IPk_toplevel_childContext { return s.kids }
+
+func (s *Pk_toplevelContext) SetKids(v []IPk_toplevel_childContext) { s.kids = v }
 
 func (s *Pk_toplevelContext) AllPk_toplevel_child() []IPk_toplevel_childContext {
 	children := s.GetChildren()
@@ -315,8 +341,12 @@ func (p *PredikitParser) Pk_toplevel() (localctx IPk_toplevelContext) {
 	for ok := true; ok; ok = ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&222) != 0) {
 		{
 			p.SetState(30)
-			p.Pk_toplevel_child()
+
+			var _x = p.Pk_toplevel_child()
+
+			localctx.(*Pk_toplevelContext)._pk_toplevel_child = _x
 		}
+		localctx.(*Pk_toplevelContext).kids = append(localctx.(*Pk_toplevelContext).kids, localctx.(*Pk_toplevelContext)._pk_toplevel_child)
 
 		p.SetState(33)
 		p.GetErrorHandler().Sync(p)
@@ -346,6 +376,24 @@ type IPk_toplevel_childContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// GetGroup returns the group rule contexts.
+	GetGroup() IPk_groupContext
+
+	// GetTest returns the test rule contexts.
+	GetTest() IPk_testContext
+
+	// GetTool returns the tool rule contexts.
+	GetTool() IPk_toolContext
+
+	// SetGroup sets the group rule contexts.
+	SetGroup(IPk_groupContext)
+
+	// SetTest sets the test rule contexts.
+	SetTest(IPk_testContext)
+
+	// SetTool sets the tool rule contexts.
+	SetTool(IPk_toolContext)
+
 	// Getter signatures
 	Pk_group() IPk_groupContext
 	Pk_test() IPk_testContext
@@ -358,6 +406,9 @@ type IPk_toplevel_childContext interface {
 type Pk_toplevel_childContext struct {
 	antlr.BaseParserRuleContext
 	parser antlr.Parser
+	group  IPk_groupContext
+	test   IPk_testContext
+	tool   IPk_toolContext
 }
 
 func NewEmptyPk_toplevel_childContext() *Pk_toplevel_childContext {
@@ -386,6 +437,18 @@ func NewPk_toplevel_childContext(parser antlr.Parser, parent antlr.ParserRuleCon
 }
 
 func (s *Pk_toplevel_childContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Pk_toplevel_childContext) GetGroup() IPk_groupContext { return s.group }
+
+func (s *Pk_toplevel_childContext) GetTest() IPk_testContext { return s.test }
+
+func (s *Pk_toplevel_childContext) GetTool() IPk_toolContext { return s.tool }
+
+func (s *Pk_toplevel_childContext) SetGroup(v IPk_groupContext) { s.group = v }
+
+func (s *Pk_toplevel_childContext) SetTest(v IPk_testContext) { s.test = v }
+
+func (s *Pk_toplevel_childContext) SetTool(v IPk_toolContext) { s.tool = v }
 
 func (s *Pk_toplevel_childContext) Pk_group() IPk_groupContext {
 	var t antlr.RuleContext
@@ -469,21 +532,30 @@ func (p *PredikitParser) Pk_toplevel_child() (localctx IPk_toplevel_childContext
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(35)
-			p.Pk_group()
+
+			var _x = p.Pk_group()
+
+			localctx.(*Pk_toplevel_childContext).group = _x
 		}
 
 	case PredikitParserPK_TEST, PredikitParserPK_RETRYING:
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(36)
-			p.Pk_test()
+
+			var _x = p.Pk_test()
+
+			localctx.(*Pk_toplevel_childContext).test = _x
 		}
 
 	case PredikitParserPK_TOOL:
 		p.EnterOuterAlt(localctx, 3)
 		{
 			p.SetState(37)
-			p.Pk_tool()
+
+			var _x = p.Pk_tool()
+
+			localctx.(*Pk_toplevel_childContext).tool = _x
 		}
 
 	default:
@@ -514,14 +586,20 @@ type IPk_groupContext interface {
 	// GetAgg_fn returns the agg_fn rule contexts.
 	GetAgg_fn() IPk_group_aggContext
 
-	// GetGroup_children returns the group_children rule contexts.
-	GetGroup_children() IPk_group_childContext
+	// Get_pk_group_child returns the _pk_group_child rule contexts.
+	Get_pk_group_child() IPk_group_childContext
 
 	// SetAgg_fn sets the agg_fn rule contexts.
 	SetAgg_fn(IPk_group_aggContext)
 
-	// SetGroup_children sets the group_children rule contexts.
-	SetGroup_children(IPk_group_childContext)
+	// Set_pk_group_child sets the _pk_group_child rule contexts.
+	Set_pk_group_child(IPk_group_childContext)
+
+	// GetGroup_children returns the group_children rule context list.
+	GetGroup_children() []IPk_group_childContext
+
+	// SetGroup_children sets the group_children rule context list.
+	SetGroup_children([]IPk_group_childContext)
 
 	// Getter signatures
 	PK_LCURLY() antlr.TerminalNode
@@ -536,9 +614,10 @@ type IPk_groupContext interface {
 
 type Pk_groupContext struct {
 	antlr.BaseParserRuleContext
-	parser         antlr.Parser
-	agg_fn         IPk_group_aggContext
-	group_children IPk_group_childContext
+	parser          antlr.Parser
+	agg_fn          IPk_group_aggContext
+	_pk_group_child IPk_group_childContext
+	group_children  []IPk_group_childContext
 }
 
 func NewEmptyPk_groupContext() *Pk_groupContext {
@@ -570,11 +649,15 @@ func (s *Pk_groupContext) GetParser() antlr.Parser { return s.parser }
 
 func (s *Pk_groupContext) GetAgg_fn() IPk_group_aggContext { return s.agg_fn }
 
-func (s *Pk_groupContext) GetGroup_children() IPk_group_childContext { return s.group_children }
+func (s *Pk_groupContext) Get_pk_group_child() IPk_group_childContext { return s._pk_group_child }
 
 func (s *Pk_groupContext) SetAgg_fn(v IPk_group_aggContext) { s.agg_fn = v }
 
-func (s *Pk_groupContext) SetGroup_children(v IPk_group_childContext) { s.group_children = v }
+func (s *Pk_groupContext) Set_pk_group_child(v IPk_group_childContext) { s._pk_group_child = v }
+
+func (s *Pk_groupContext) GetGroup_children() []IPk_group_childContext { return s.group_children }
+
+func (s *Pk_groupContext) SetGroup_children(v []IPk_group_childContext) { s.group_children = v }
 
 func (s *Pk_groupContext) PK_LCURLY() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_LCURLY, 0)
@@ -695,8 +778,9 @@ func (p *PredikitParser) Pk_group() (localctx IPk_groupContext) {
 
 			var _x = p.Pk_group_child()
 
-			localctx.(*Pk_groupContext).group_children = _x
+			localctx.(*Pk_groupContext)._pk_group_child = _x
 		}
+		localctx.(*Pk_groupContext).group_children = append(localctx.(*Pk_groupContext).group_children, localctx.(*Pk_groupContext)._pk_group_child)
 
 		p.SetState(45)
 		p.GetErrorHandler().Sync(p)
@@ -734,6 +818,24 @@ type IPk_group_childContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
+	// GetTest returns the test rule contexts.
+	GetTest() IPk_testContext
+
+	// GetGroup returns the group rule contexts.
+	GetGroup() IPk_groupContext
+
+	// GetActual_param returns the actual_param rule contexts.
+	GetActual_param() IPk_actual_paramContext
+
+	// SetTest sets the test rule contexts.
+	SetTest(IPk_testContext)
+
+	// SetGroup sets the group rule contexts.
+	SetGroup(IPk_groupContext)
+
+	// SetActual_param sets the actual_param rule contexts.
+	SetActual_param(IPk_actual_paramContext)
+
 	// Getter signatures
 	Pk_test() IPk_testContext
 	Pk_group() IPk_groupContext
@@ -745,7 +847,10 @@ type IPk_group_childContext interface {
 
 type Pk_group_childContext struct {
 	antlr.BaseParserRuleContext
-	parser antlr.Parser
+	parser       antlr.Parser
+	test         IPk_testContext
+	group        IPk_groupContext
+	actual_param IPk_actual_paramContext
 }
 
 func NewEmptyPk_group_childContext() *Pk_group_childContext {
@@ -774,6 +879,18 @@ func NewPk_group_childContext(parser antlr.Parser, parent antlr.ParserRuleContex
 }
 
 func (s *Pk_group_childContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Pk_group_childContext) GetTest() IPk_testContext { return s.test }
+
+func (s *Pk_group_childContext) GetGroup() IPk_groupContext { return s.group }
+
+func (s *Pk_group_childContext) GetActual_param() IPk_actual_paramContext { return s.actual_param }
+
+func (s *Pk_group_childContext) SetTest(v IPk_testContext) { s.test = v }
+
+func (s *Pk_group_childContext) SetGroup(v IPk_groupContext) { s.group = v }
+
+func (s *Pk_group_childContext) SetActual_param(v IPk_actual_paramContext) { s.actual_param = v }
 
 func (s *Pk_group_childContext) Pk_test() IPk_testContext {
 	var t antlr.RuleContext
@@ -857,21 +974,30 @@ func (p *PredikitParser) Pk_group_child() (localctx IPk_group_childContext) {
 		p.EnterOuterAlt(localctx, 1)
 		{
 			p.SetState(49)
-			p.Pk_test()
+
+			var _x = p.Pk_test()
+
+			localctx.(*Pk_group_childContext).test = _x
 		}
 
 	case PredikitParserPK_ALL, PredikitParserPK_ANY, PredikitParserPK_NONE:
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(50)
-			p.Pk_group()
+
+			var _x = p.Pk_group()
+
+			localctx.(*Pk_group_childContext).group = _x
 		}
 
 	case PredikitParserPK_ID:
 		p.EnterOuterAlt(localctx, 3)
 		{
 			p.SetState(51)
-			p.Pk_actual_param()
+
+			var _x = p.Pk_actual_param()
+
+			localctx.(*Pk_group_childContext).actual_param = _x
 		}
 
 	default:

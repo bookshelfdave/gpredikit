@@ -11,6 +11,7 @@ all {
     // is the file /bin/zsh executable?
     test executable? {
       path: "/bin/zsh"
+      extra_param: true
     }
 
     // is the `zsh` command on the path?
