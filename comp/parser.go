@@ -1,6 +1,7 @@
 package comp
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -23,10 +24,15 @@ type TreeShapeListener struct {
 	// the return values from walking the tree
 	TopLevelChecks []*AstCheckDef
 	ToolDefs       []*AstToolDef
+	Errors         []error
 }
 
 func NewTreeShapeListener(filename string) *TreeShapeListener {
 	return &TreeShapeListener{TreeProps: make(map[any]any), Filename: filename}
+}
+
+func (tsl *TreeShapeListener) AddError(err error) {
+	tsl.Errors = append(tsl.Errors, err)
 }
 
 func (tsl *TreeShapeListener) MakeAddress(t antlr.Token) ContentAddress {
@@ -152,8 +158,13 @@ func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_pa
 	} else if ctx.GetVi() != nil {
 		v, err := strconv.Atoi(ctx.GetVi().GetText())
 		if err != nil {
+			// this would happen if you pass a massive number in as an int
+			// TODO: check min/max parseable values
 			msg := fmt.Sprintf("Cannot parse number at %d:%d", ctx.GetVi().GetLine(), ctx.GetVi().GetColumn())
-			panic(msg)
+			tsl.AddError(errors.New(msg))
+			// return a valid value, the upstream compiler code will check for an empty
+			// list of errors to see if it can continue
+			retval = NewUnnamedParamInt(0)
 		}
 		retval = NewUnnamedParamInt(v)
 	} else if ctx.GetVb() != nil {
@@ -261,14 +272,20 @@ func (tsl *TreeShapeListener) ExitPk_tool_actual_param_value(ctx *parser.Pk_tool
 	} else if ctx.GetVi() != nil {
 		v, err := strconv.Atoi(ctx.GetVi().GetText())
 		if err != nil {
-			// TODO add these to a list of compile errors
-			panic("Cannot parse number")
+			// this would happen if you pass a massive number in as an int
+			msg := fmt.Sprintf("Cannot parse number at %d:%d", ctx.GetVi().GetLine(), ctx.GetVi().GetColumn())
+			tsl.AddError(errors.New(msg))
+			// return a valid value, the upstream compiler code will check for an empty
+			// list of errors to see if it can continue
+			retval = NewUnnamedParamInt(0)
+
 		}
 		retval = NewUnnamedParamInt(v)
 	} else if ctx.GetVb() != nil {
 		v, err := strconv.ParseBool(ctx.GetVb().GetText())
 		if err != nil {
-			// TODO add these to a list of compile errors
+			// this shouldn't happen, antlr will return either true or false... If you get here, something
+			// is _really_ broken
 			panic("Cannot parse bool")
 		}
 		retval = NewUnnamedParamBool(v)
@@ -283,9 +300,9 @@ func (tsl *TreeShapeListener) ExitPk_tool_actual_param_value(ctx *parser.Pk_tool
 }
 
 func Run() {
-	fmt.Println("Compiling...")
-
 	filename := "./checks/first.pk"
+	fmt.Printf("Compiling %s\n", filename)
+
 	input, _ := antlr.NewFileStream(filename)
 	lexer := parser.NewPredikitLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)
@@ -294,6 +311,13 @@ func Run() {
 	tree := p.Pk_toplevel()
 	tsl := NewTreeShapeListener(filename)
 	antlr.ParseTreeWalkerDefault.Walk(tsl, tree)
+	if len(tsl.Errors) > 0 {
+		for _, e := range tsl.Errors {
+			// TODO: figure out where / how to write errors
+			fmt.Printf("Compile error: %s\n", e)
+		}
+		return
+	}
 	astFile := AstFile{
 		Filename: filename,
 		Checks:   tsl.TopLevelChecks,
