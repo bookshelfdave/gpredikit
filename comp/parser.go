@@ -8,7 +8,7 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/bookshelfdave/gpredikit/parser"
 
-	. "github.com/bookshelfdave/gpredikit/runtime"
+	rt "github.com/bookshelfdave/gpredikit/runtime"
 	//"golang.org/x/exp/slices"
 	"github.com/davecgh/go-spew/spew"
 )
@@ -36,8 +36,8 @@ func (tsl *TreeShapeListener) AddError(err error) {
 	tsl.Errors = append(tsl.Errors, err)
 }
 
-func (tsl *TreeShapeListener) MakeAddress(t antlr.Token) ContentAddress {
-	return ContentAddress{
+func (tsl *TreeShapeListener) MakeAddress(t antlr.Token) rt.ContentAddress {
+	return rt.ContentAddress{
 		Line:     t.GetLine(),
 		Col:      t.GetColumn(),
 		Filename: tsl.Filename,
@@ -48,11 +48,11 @@ func (tsl *TreeShapeListener) ExitPk_toplevel(ctx *parser.Pk_toplevelContext) {
 	// Children is already a method in Antlr
 	for _, child := range ctx.GetKids() {
 		v := tsl.TreeProps[child]
-		switch v.(type) {
+		switch v := v.(type) {
 		case *AstChkInstance:
-			tsl.TopLevelChecks = append(tsl.TopLevelChecks, v.(*AstChkInstance))
+			tsl.TopLevelChecks = append(tsl.TopLevelChecks, v)
 		case *AstToolDef:
-			tsl.ToolDefs = append(tsl.ToolDefs, v.(*AstToolDef))
+			tsl.ToolDefs = append(tsl.ToolDefs, v)
 		default:
 			msg := fmt.Sprintf("Unexpected top level element %+v", v)
 			panic(msg)
@@ -90,25 +90,25 @@ func (tsl *TreeShapeListener) ExitPk_group_agg(ctx *parser.Pk_group_aggContext) 
 	}
 	as := &AddressableString{Address: tsl.MakeAddress(t), V: s}
 	tsl.TreeProps[ctx] = as
-
 }
+
 func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
 	// it's harder to get the content address here because we only have non-terminals
 	// so use an "AddressableString" to get the first position of "all" | "any" | "none"
 	aggFn := tsl.TreeProps[ctx.GetAgg_fn()].(*AddressableString)
 
-	actualParams := make([]*ActualParam, 0)
+	actualParams := make([]*rt.ActualParam, 0)
 	children := make([]*AstChkInstance, 0)
 	gcs := ctx.GetGroup_children()
 
 	for _, gc := range gcs {
 		v := tsl.TreeProps[gc]
-		switch v.(type) {
+		switch v := v.(type) {
 		case *AstChkInstance:
-			cd := v.(*AstChkInstance)
+			cd := v
 			children = append(children, cd)
-		case *ActualParam:
-			app := v.(*ActualParam)
+		case *rt.ActualParam:
+			app := v
 			actualParams = append(actualParams, app)
 		default:
 			fmt.Printf("Found unexpected group element! %+v\n", v)
@@ -144,17 +144,17 @@ func (tsl *TreeShapeListener) ExitPk_group_child(ctx *parser.Pk_group_childConte
 // func (tsl *TreeShapeListener) ExitPk_group_agg(ctx *parser.Pk_group_aggContext) {}
 
 func (tsl *TreeShapeListener) ExitPk_actual_param(ctx *parser.Pk_actual_paramContext) {
-	v := tsl.TreeProps[ctx.Pk_actual_param_value()].(*ActualParam)
+	v := tsl.TreeProps[ctx.Pk_actual_param_value()].(*rt.ActualParam)
 	v.Name = ctx.GetParam_name().GetText()
 	tsl.TreeProps[ctx] = v
 }
 
 func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_param_valueContext) {
-	var retval *ActualParam
+	var retval *rt.ActualParam
 	if ctx.GetVs() != nil {
 		// String will alwaytsl come from Antlr with double quotetsl on each end
 		v := StripFirstAndLast(ctx.GetVs().GetText())
-		retval = NewUnnamedParamString(v)
+		retval = rt.NewUnnamedParamString(v)
 
 	} else if ctx.GetVi() != nil {
 		v, err := strconv.Atoi(ctx.GetVi().GetText())
@@ -165,9 +165,10 @@ func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_pa
 			tsl.AddError(errors.New(msg))
 			// return a valid value, the upstream compiler code will check for an empty
 			// list of errors to see if it can continue
-			retval = NewUnnamedParamInt(0)
+			retval = rt.NewUnnamedParamInt(0)
+		} else {
+			retval = rt.NewUnnamedParamInt(v)
 		}
-		retval = NewUnnamedParamInt(v)
 	} else if ctx.GetVb() != nil {
 		v, err := strconv.ParseBool(ctx.GetVb().GetText())
 		if err != nil {
@@ -175,20 +176,20 @@ func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_pa
 			// is _really_ broken
 			panic("Cannot parse bool")
 		}
-		retval = NewUnnamedParamBool(v)
+		retval = rt.NewUnnamedParamBool(v)
 	} else if ctx.GetVc() != nil {
 		// NOT IMPLEMENTED, THIS JUST RETURNS THE ENTIRE STRING
-		retval = NewUnnamedParamString(ctx.GetVc().GetText())
+		retval = rt.NewUnnamedParamString(ctx.GetVc().GetText())
 	}
 	tsl.TreeProps[ctx] = retval
 }
 
 func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 	aps := ctx.GetAps()
-	actualParams := make([]*ActualParam, len(aps))
+	actualParams := make([]*rt.ActualParam, len(aps))
 	for _, ap := range aps {
 		v := tsl.TreeProps[ap]
-		app := v.(*ActualParam)
+		app := v.(*rt.ActualParam)
 		actualParams = append(actualParams, app)
 	}
 
@@ -211,18 +212,18 @@ func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 func (tsl *TreeShapeListener) ExitPk_tool(ctx *parser.Pk_toolContext) {
 	td := &AstToolDef{
 		ToolName:       ctx.GetTool_name().GetText(),
-		ClassParams:    []*ActualParam{},
-		InstanceParams: map[string][]*ActualParam{},
+		ClassParams:    []*rt.ActualParam{},
+		InstanceParams: map[string][]*rt.ActualParam{},
 		Address:        tsl.MakeAddress(ctx.GetTool_name()),
 	}
 
 	for _, toolChild := range ctx.GetKids() {
 		v := tsl.TreeProps[toolChild]
-		switch v.(type) {
-		case *ActualParam:
-			td.ClassParams = append(td.ClassParams, v.(*ActualParam))
+		switch v := v.(type) {
+		case *rt.ActualParam:
+			td.ClassParams = append(td.ClassParams, v)
 		case *AstToolInstanceParam:
-			ip := v.(*AstToolInstanceParam)
+			ip := v
 			td.InstanceParams[ip.ParamName] = ip.ParamsProps
 		}
 	}
@@ -241,10 +242,10 @@ func (tsl *TreeShapeListener) ExitPk_tool_child(ctx *parser.Pk_tool_childContext
 
 func (tsl *TreeShapeListener) ExitPk_tool_metaparam(ctx *parser.Pk_tool_metaparamContext) {
 	paramName := ctx.GetTool_param_name().GetText()
-	paramProps := make([]*ActualParam, 0)
+	paramProps := make([]*rt.ActualParam, 0)
 	for _, tap := range ctx.GetTool_actual_params() {
 		ap := tsl.TreeProps[tap]
-		paramProps = append(paramProps, ap.(*ActualParam))
+		paramProps = append(paramProps, ap.(*rt.ActualParam))
 	}
 	ips := &AstToolInstanceParam{
 		ParamName:   paramName,
@@ -255,7 +256,7 @@ func (tsl *TreeShapeListener) ExitPk_tool_metaparam(ctx *parser.Pk_tool_metapara
 }
 
 func (tsl *TreeShapeListener) ExitPk_tool_actual_param(ctx *parser.Pk_tool_actual_paramContext) {
-	v := tsl.TreeProps[ctx.GetParam_value()].(*ActualParam)
+	v := tsl.TreeProps[ctx.GetParam_value()].(*rt.ActualParam)
 	v.Name = ctx.GetParam_name().GetText()
 	v.Address = tsl.MakeAddress(ctx.GetParam_name())
 	tsl.TreeProps[ctx] = v
@@ -265,11 +266,11 @@ func (tsl *TreeShapeListener) ExitPk_tool_actual_param_value(ctx *parser.Pk_tool
 	// tool_actual_params have type names in addition to string|int|bool|etc
 	// TODO: maybe reuse the code between actual_param and tool_actual_param?
 	// might not be possible due to different parent types
-	var retval *ActualParam
+	var retval *rt.ActualParam
 	if ctx.GetVs() != nil {
 		// String will alwaytsl come from Antlr with double quotetsl on each end
 		v := StripFirstAndLast(ctx.GetVs().GetText())
-		retval = NewUnnamedParamString(v)
+		retval = rt.NewUnnamedParamString(v)
 	} else if ctx.GetVi() != nil {
 		v, err := strconv.Atoi(ctx.GetVi().GetText())
 		if err != nil {
@@ -278,10 +279,10 @@ func (tsl *TreeShapeListener) ExitPk_tool_actual_param_value(ctx *parser.Pk_tool
 			tsl.AddError(errors.New(msg))
 			// return a valid value, the upstream compiler code will check for an empty
 			// list of errors to see if it can continue
-			retval = NewUnnamedParamInt(0)
-
+			retval = rt.NewUnnamedParamInt(0)
+		} else {
+			retval = rt.NewUnnamedParamInt(v)
 		}
-		retval = NewUnnamedParamInt(v)
 	} else if ctx.GetVb() != nil {
 		v, err := strconv.ParseBool(ctx.GetVb().GetText())
 		if err != nil {
@@ -289,15 +290,14 @@ func (tsl *TreeShapeListener) ExitPk_tool_actual_param_value(ctx *parser.Pk_tool
 			// is _really_ broken
 			panic("Cannot parse bool")
 		}
-		retval = NewUnnamedParamBool(v)
+		retval = rt.NewUnnamedParamBool(v)
 	} else if ctx.GetVc() != nil {
 		// NOT IMPLEMENTED, THIS JUST RETURNS THE ENTIRE STRING
-		retval = NewUnnamedParamString(ctx.GetVc().GetText())
+		retval = rt.NewUnnamedParamString(ctx.GetVc().GetText())
 	} else if ctx.GetVtn() != nil {
-		retval = NewUnnamedParamTypeName(ctx.GetVtn().GetText())
+		retval = rt.NewUnnamedParamTypeName(ctx.GetVtn().GetText())
 	}
 	tsl.TreeProps[ctx] = retval
-
 }
 
 func Run() {

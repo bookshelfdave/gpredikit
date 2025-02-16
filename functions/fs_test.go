@@ -3,18 +3,18 @@ package functions
 import (
 	"testing"
 
-	. "github.com/bookshelfdave/gpredikit/runtime"
+	rt "github.com/bookshelfdave/gpredikit/runtime"
 )
 
 func TestFileExists(t *testing.T) {
 	fn := DefFileExists()
-	runEnv := &RunEnv{}
+	runEnv := &rt.RunEnv{}
 
-	actualParams := BuildActualParams().
+	actualParams := rt.BuildActualParams().
 		NewNamedParamString("path", "/bin/sh").
 		Build()
 
-	instance := &ChkInstance{}
+	instance := &rt.ChkInstance{}
 
 	result := fn.CheckFunction(actualParams, runEnv, instance)
 	if !result.TestResult {
@@ -24,13 +24,13 @@ func TestFileExists(t *testing.T) {
 
 func TestIsDir(t *testing.T) {
 	fn := DefIsDir()
-	runEnv := &RunEnv{}
+	runEnv := &rt.RunEnv{}
 
-	actualParams := BuildActualParams().
+	actualParams := rt.BuildActualParams().
 		NewNamedParamString("path", "/bin").
 		Build()
 
-	instance := &ChkInstance{}
+	instance := &rt.ChkInstance{}
 
 	result := fn.CheckFunction(actualParams, runEnv, instance)
 	if !result.TestResult {
@@ -40,13 +40,13 @@ func TestIsDir(t *testing.T) {
 
 func TestIsFile(t *testing.T) {
 	fn := DefIsFile()
-	runEnv := &RunEnv{}
+	runEnv := &rt.RunEnv{}
 
-	actualParams := BuildActualParams().
+	actualParams := rt.BuildActualParams().
 		NewNamedParamString("path", "/bin/sh").
 		Build()
 
-	instance := &ChkInstance{}
+	instance := &rt.ChkInstance{}
 
 	result := fn.CheckFunction(actualParams, runEnv, instance)
 	if !result.TestResult {
@@ -56,13 +56,13 @@ func TestIsFile(t *testing.T) {
 
 func TestOnPath(t *testing.T) {
 	fn := DefOnPath()
-	runEnv := &RunEnv{}
+	runEnv := &rt.RunEnv{}
 
-	actualParams := BuildActualParams().
+	actualParams := rt.BuildActualParams().
 		NewNamedParamString("cmd", "sh").
 		Build()
 
-	instance := &ChkInstance{}
+	instance := &rt.ChkInstance{}
 
 	result := fn.CheckFunction(actualParams, runEnv, instance)
 

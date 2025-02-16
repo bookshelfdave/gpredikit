@@ -49,10 +49,19 @@ func ChkError(err error) *ChkResult {
 
 // ChkInstance is a fully compiled AstChkInstance
 type ChkInstance struct {
-	Name string
+	Name                     string
+	Title                    *string
+	Def                      *ChkDef
+	ActualParams             []*ActualParam
+	MaterializedFormalParams []*FormalParam
+	Children                 []*ChkInstance
+	IsNegated                bool
+	IsRetrying               bool
+	IsQuery                  bool
+	InstanceID               uint
+	Address                  ContentAddress
 }
 
-type RunEnv struct {
-}
+type RunEnv struct{}
 
 type ChkFn func(actualParams map[string]*ActualParam, runEnv *RunEnv, chkInst *ChkInstance) *ChkResult
