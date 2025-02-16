@@ -1,25 +1,21 @@
 package comp
 
+import . "github.com/bookshelfdave/gpredikit/runtime"
+
 func ProcessInputFiles() {
 	Run()
 }
 
 type AstFile struct {
 	Filename string
-	Checks   []*AstCheckDef
+	Checks   []*AstChkInstance
 	Tools    []*AstToolDef
 }
 
-type ContentAddress struct {
-	Line     int
-	Col      int
-	Filename string
-}
-
-type AstCheckDef struct {
+type AstChkInstance struct {
 	FnName       string
 	ActualParams []*ActualParam
-	Children     []*AstCheckDef
+	Children     []*AstChkInstance
 
 	IsNegated  bool
 	IsRetrying bool

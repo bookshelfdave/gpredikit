@@ -8,6 +8,7 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 	"github.com/bookshelfdave/gpredikit/parser"
 
+	. "github.com/bookshelfdave/gpredikit/runtime"
 	//"golang.org/x/exp/slices"
 	"github.com/davecgh/go-spew/spew"
 )
@@ -22,7 +23,7 @@ type TreeShapeListener struct {
 	Filename string
 
 	// the return values from walking the tree
-	TopLevelChecks []*AstCheckDef
+	TopLevelChecks []*AstChkInstance
 	ToolDefs       []*AstToolDef
 	Errors         []error
 }
@@ -48,8 +49,8 @@ func (tsl *TreeShapeListener) ExitPk_toplevel(ctx *parser.Pk_toplevelContext) {
 	for _, child := range ctx.GetKids() {
 		v := tsl.TreeProps[child]
 		switch v.(type) {
-		case *AstCheckDef:
-			tsl.TopLevelChecks = append(tsl.TopLevelChecks, v.(*AstCheckDef))
+		case *AstChkInstance:
+			tsl.TopLevelChecks = append(tsl.TopLevelChecks, v.(*AstChkInstance))
 		case *AstToolDef:
 			tsl.ToolDefs = append(tsl.ToolDefs, v.(*AstToolDef))
 		default:
@@ -97,14 +98,14 @@ func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
 	aggFn := tsl.TreeProps[ctx.GetAgg_fn()].(*AddressableString)
 
 	actualParams := make([]*ActualParam, 0)
-	children := make([]*AstCheckDef, 0)
+	children := make([]*AstChkInstance, 0)
 	gcs := ctx.GetGroup_children()
 
 	for _, gc := range gcs {
 		v := tsl.TreeProps[gc]
 		switch v.(type) {
-		case *AstCheckDef:
-			cd := v.(*AstCheckDef)
+		case *AstChkInstance:
+			cd := v.(*AstChkInstance)
 			children = append(children, cd)
 		case *ActualParam:
 			app := v.(*ActualParam)
@@ -118,7 +119,7 @@ func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
 	isNegated := false
 	isRetrying := false
 	isGroup := true
-	cd := &AstCheckDef{
+	cd := &AstChkInstance{
 		FnName:       aggFn.V,
 		ActualParams: actualParams,
 		Children:     children,
@@ -195,10 +196,10 @@ func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 	isNegated := ctx.PK_NOT() != nil
 	isRetrying := ctx.PK_RETRYING() != nil
 	isGroup := false
-	cd := &AstCheckDef{
+	cd := &AstChkInstance{
 		FnName:       fnname,
 		ActualParams: actualParams,
-		Children:     []*AstCheckDef{},
+		Children:     []*AstChkInstance{},
 		Address:      tsl.MakeAddress(ctx.GetTestname()),
 		IsNegated:    isNegated,
 		IsRetrying:   isRetrying,
