@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/antlr4-go/antlr/v4"
+	"github.com/bookshelfdave/gpredikit/functions"
 	"github.com/bookshelfdave/gpredikit/parser"
 
 	rt "github.com/bookshelfdave/gpredikit/runtime"
@@ -97,7 +98,7 @@ func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
 	// so use an "AddressableString" to get the first position of "all" | "any" | "none"
 	aggFn := tsl.TreeProps[ctx.GetAgg_fn()].(*AddressableString)
 
-	actualParams := make([]*rt.ActualParam, 0)
+	actualParams := make(map[string]*rt.ActualParam, 0)
 	children := make([]*AstChkInstance, 0)
 	gcs := ctx.GetGroup_children()
 
@@ -109,7 +110,13 @@ func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
 			children = append(children, cd)
 		case *rt.ActualParam:
 			app := v
-			actualParams = append(actualParams, app)
+			if _, ok := actualParams[app.Name]; ok {
+				// parameter defined multiple times!
+				tsl.AddError(fmt.Errorf("Parameter %s appears multiple times in file %s at line %d, col %d",
+					app.Name, tsl.Filename, aggFn.Address.Line, aggFn.Address.Col))
+
+			}
+			actualParams[app.Name] = app
 		default:
 			fmt.Printf("Found unexpected group element! %+v\n", v)
 			panic("Found unexpected group element")
@@ -186,11 +193,17 @@ func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_pa
 
 func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 	aps := ctx.GetAps()
-	actualParams := make([]*rt.ActualParam, len(aps))
+	address := tsl.MakeAddress(ctx.GetTestname())
+	actualParams := make(map[string]*rt.ActualParam, len(aps))
 	for _, ap := range aps {
 		v := tsl.TreeProps[ap]
 		app := v.(*rt.ActualParam)
-		actualParams = append(actualParams, app)
+		if _, ok := actualParams[app.Name]; ok {
+			tsl.AddError(fmt.Errorf("Parameter %s appears multiple times in file %s at line %d, col %d",
+				app.Name, tsl.Filename, address.Line, address.Col))
+		} else {
+			actualParams[app.Name] = app
+		}
 	}
 
 	fnname := ctx.GetTestname().GetText()
@@ -201,7 +214,7 @@ func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 		FnName:       fnname,
 		ActualParams: actualParams,
 		Children:     []*AstChkInstance{},
-		Address:      tsl.MakeAddress(ctx.GetTestname()),
+		Address:      address,
 		IsNegated:    isNegated,
 		IsRetrying:   isRetrying,
 		IsGroup:      isGroup,
@@ -300,6 +313,13 @@ func (tsl *TreeShapeListener) ExitPk_tool_actual_param_value(ctx *parser.Pk_tool
 	tsl.TreeProps[ctx] = retval
 }
 
+func DumpAstObject(o any) {
+	spew.Config.Indent = "    "
+	spew.Config.DisablePointerAddresses = true
+	spew.Config.DisableCapacities = true
+	spew.Dump(o)
+}
+
 func Run() {
 	filename := "./checks/first.pk"
 	fmt.Printf("Compiling %s\n", filename)
@@ -324,6 +344,33 @@ func Run() {
 		Checks:   tsl.TopLevelChecks,
 		Tools:    tsl.ToolDefs,
 	}
-	spew.Config.Indent = "\t"
-	spew.Dump(astFile)
+
+	// TODO: move everything below
+	allAstFiles := []*AstFile{&astFile}
+	reg := rt.NewChkRegistry()
+	functions.RegisterBuiltins(reg)
+
+	compiledAstFiles := CompileChecksToAsts(allAstFiles, reg)
+
+	for _, cfo := range compiledAstFiles {
+		for _, err := range cfo.Errors {
+			fmt.Printf("Error: %s\n", err)
+		}
+		if len(cfo.Errors) != 0 {
+			// run all checks
+			return
+		}
+	}
+
+	runEnv := &rt.RunEnv{}
+	for _, cfo := range compiledAstFiles {
+		fmt.Printf("Running checks from %s\n", cfo.Filename)
+		for _, inst := range cfo.Instances {
+			fmt.Printf("Running check %s\n", inst.BuildPath())
+
+			result := rt.RunCheckMaybeRetry(inst, runEnv)
+			fmt.Printf("Result = %#v\n", result)
+
+		}
+	}
 }

@@ -1,6 +1,8 @@
 package comp
 
-import rt "github.com/bookshelfdave/gpredikit/runtime"
+import (
+	rt "github.com/bookshelfdave/gpredikit/runtime"
+)
 
 func ProcessInputFiles() {
 	Run()
@@ -14,7 +16,7 @@ type AstFile struct {
 
 type AstChkInstance struct {
 	FnName       string
-	ActualParams []*rt.ActualParam
+	ActualParams map[string]*rt.ActualParam
 	Children     []*AstChkInstance
 
 	IsNegated  bool
@@ -22,6 +24,12 @@ type AstChkInstance struct {
 	IsGroup    bool
 
 	Address rt.ContentAddress
+}
+
+func NewAstChkInstance() *AstChkInstance {
+	return &AstChkInstance{
+		ActualParams: make(map[string]*rt.ActualParam),
+	}
 }
 
 type AstToolDef struct {

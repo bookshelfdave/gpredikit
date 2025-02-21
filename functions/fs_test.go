@@ -7,64 +7,61 @@ import (
 )
 
 func TestFileExists(t *testing.T) {
-	fn := DefFileExists()
+	cd := defFileExists()
 	runEnv := &rt.RunEnv{}
 
-	actualParams := rt.BuildActualParams().
-		NewNamedParamString("path", "/bin/sh").
-		Build()
+	actualParams := rt.MakeTestParams(cd, rt.TestParams{
+		"path": "/bin/sh",
+	})
 
 	instance := &rt.ChkInstance{}
 
-	result := fn.CheckFunction(actualParams, runEnv, instance)
+	result := cd.CheckFunction(actualParams, runEnv, instance)
 	if !result.TestResult {
 		t.Fail()
 	}
 }
 
 func TestIsDir(t *testing.T) {
-	fn := DefIsDir()
+	cd := defIsDir()
 	runEnv := &rt.RunEnv{}
 
-	actualParams := rt.BuildActualParams().
-		NewNamedParamString("path", "/bin").
-		Build()
-
+	actualParams := rt.MakeTestParams(cd, rt.TestParams{
+		"path": "/bin/sh",
+	})
 	instance := &rt.ChkInstance{}
 
-	result := fn.CheckFunction(actualParams, runEnv, instance)
+	result := cd.CheckFunction(actualParams, runEnv, instance)
 	if !result.TestResult {
 		t.Fail()
 	}
 }
 
 func TestIsFile(t *testing.T) {
-	fn := DefIsFile()
+	cd := defIsFile()
 	runEnv := &rt.RunEnv{}
 
-	actualParams := rt.BuildActualParams().
-		NewNamedParamString("path", "/bin/sh").
-		Build()
-
+	actualParams := rt.MakeTestParams(cd, rt.TestParams{
+		"path": "/bin/sh",
+	})
 	instance := &rt.ChkInstance{}
 
-	result := fn.CheckFunction(actualParams, runEnv, instance)
+	result := cd.CheckFunction(actualParams, runEnv, instance)
 	if !result.TestResult {
 		t.Fail()
 	}
 }
 
 func TestOnPath(t *testing.T) {
-	fn := DefOnPath()
+	cd := defOnPath()
 	runEnv := &rt.RunEnv{}
 
-	actualParams := rt.BuildActualParams().
-		NewNamedParamString("cmd", "sh").
-		Build()
-
+	actualParams := rt.MakeTestParams(cd, rt.TestParams{
+		"path": "/bin/sh",
+	})
 	instance := &rt.ChkInstance{}
 
-	result := fn.CheckFunction(actualParams, runEnv, instance)
+	result := cd.CheckFunction(actualParams, runEnv, instance)
 
 	if !result.TestResult {
 		t.Fail()

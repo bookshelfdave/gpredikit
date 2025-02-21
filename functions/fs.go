@@ -8,19 +8,18 @@ import (
 	rt "github.com/bookshelfdave/gpredikit/runtime"
 )
 
-func DefFileExists() *rt.ChkDef {
+func defFileExists() *rt.ChkDef {
 	return &rt.ChkDef{
 		Name: "exists?",
-		CheckFunction: func(actualParams map[string]*rt.ActualParam, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
-			path := actualParams["path"]
-			spath, _ := path.GetString()
+		CheckFunction: func(actualParams *rt.ActualParams, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
+			path, _ := actualParams.GetStringOrDefault("path")
 
-			if _, err := os.Stat(spath); err == nil {
-				return rt.ChkPass()
+			if _, err := os.Stat(path); err == nil {
+				return rt.ResPass()
 			} else if errors.Is(err, os.ErrNotExist) {
-				return rt.ChkFail()
+				return rt.ResFail()
 			} else {
-				return rt.ChkError(err)
+				return rt.ResError(err)
 			}
 		},
 		FormalParams: rt.BuildFormalParams().
@@ -30,19 +29,18 @@ func DefFileExists() *rt.ChkDef {
 	}
 }
 
-func DefIsDir() *rt.ChkDef {
+func defIsDir() *rt.ChkDef {
 	return &rt.ChkDef{
 		Name: "is_dir?",
-		CheckFunction: func(actualParams map[string]*rt.ActualParam, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
-			path := actualParams["path"]
-			spath, _ := path.GetString()
+		CheckFunction: func(actualParams *rt.ActualParams, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
+			path, _ := actualParams.GetStringOrDefault("path")
 
-			if stat, err := os.Stat(spath); err == nil {
-				return rt.ChkOk(stat.IsDir())
+			if stat, err := os.Stat(path); err == nil {
+				return rt.ResOk(stat.IsDir())
 			} else if errors.Is(err, os.ErrNotExist) {
-				return rt.ChkOk(false)
+				return rt.ResOk(false)
 			} else {
-				return rt.ChkError(err)
+				return rt.ResError(err)
 			}
 		},
 		FormalParams: rt.BuildFormalParams().
@@ -52,19 +50,18 @@ func DefIsDir() *rt.ChkDef {
 	}
 }
 
-func DefIsFile() *rt.ChkDef {
+func defIsFile() *rt.ChkDef {
 	return &rt.ChkDef{
 		Name: "is_file?",
-		CheckFunction: func(actualParams map[string]*rt.ActualParam, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
-			path := actualParams["path"]
-			spath, _ := path.GetString()
+		CheckFunction: func(actualParams *rt.ActualParams, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
+			path, _ := actualParams.GetStringOrDefault("path")
 
-			if stat, err := os.Stat(spath); err == nil {
-				return rt.ChkOk(stat.Mode().IsRegular())
+			if stat, err := os.Stat(path); err == nil {
+				return rt.ResOk(stat.Mode().IsRegular())
 			} else if errors.Is(err, os.ErrNotExist) {
-				return rt.ChkOk(false)
+				return rt.ResOk(false)
 			} else {
-				return rt.ChkError(err)
+				return rt.ResError(err)
 			}
 		},
 		FormalParams: rt.BuildFormalParams().
@@ -74,18 +71,17 @@ func DefIsFile() *rt.ChkDef {
 	}
 }
 
-func DefOnPath() *rt.ChkDef {
+func defOnPath() *rt.ChkDef {
 	return &rt.ChkDef{
 		Name: "on_path?",
-		CheckFunction: func(actualParams map[string]*rt.ActualParam, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
-			path := actualParams["cmd"]
-			spath, _ := path.GetString()
+		CheckFunction: func(actualParams *rt.ActualParams, _ *rt.RunEnv, _ *rt.ChkInstance) *rt.ChkResult {
+			path, _ := actualParams.GetStringOrDefault("path")
 
 			// TODO: it would be nice to log the path that's returned
-			if _, err := exec.LookPath(spath); err == nil {
-				return rt.ChkPass()
+			if _, err := exec.LookPath(path); err == nil {
+				return rt.ResPass()
 			} else {
-				return rt.ChkFail()
+				return rt.ResFail()
 			}
 		},
 		FormalParams: rt.BuildFormalParams().

@@ -1,5 +1,11 @@
 package runtime
 
+import "fmt"
+
+type RunEnv struct{}
+
+type ChkFn func(actualParams *ActualParams, runEnv *RunEnv, chkInst *ChkInstance) *ChkResult
+
 type ChkDef struct {
 	Name            string
 	CheckFunction   ChkFn
@@ -8,6 +14,26 @@ type ChkDef struct {
 	IsGroup         bool
 	IsQuery         bool
 	TemplateParams  map[string]*ActualParam
+}
+
+func (c *ChkDef) Validate() error {
+	if c.Name == "" {
+		return fmt.Errorf("check definition requires a name")
+	}
+
+	if c.CheckFunction == nil {
+		return fmt.Errorf("check definition requires a check function")
+	}
+
+	if c.FormalParams == nil {
+		return fmt.Errorf("check definition requires formal parameters (use EmptyFormalParams() for no params)")
+	}
+
+	return nil
+}
+
+func EmptyFormalParams() map[string]*FormalParam {
+	return make(map[string]*FormalParam)
 }
 
 type ChkOutput struct {
@@ -22,25 +48,25 @@ type ChkResult struct {
 	Output     *ChkOutput
 }
 
-func ChkOk(res bool) *ChkResult {
+func ResOk(res bool) *ChkResult {
 	return &ChkResult{
 		TestResult: res,
 	}
 }
 
-func ChkPass() *ChkResult {
+func ResPass() *ChkResult {
 	return &ChkResult{
 		TestResult: true,
 	}
 }
 
-func ChkFail() *ChkResult {
+func ResFail() *ChkResult {
 	return &ChkResult{
 		TestResult: false,
 	}
 }
 
-func ChkError(err error) *ChkResult {
+func ResError(err error) *ChkResult {
 	return &ChkResult{
 		TestResult: false,
 		Err:        err,
@@ -49,19 +75,53 @@ func ChkError(err error) *ChkResult {
 
 // ChkInstance is a fully compiled AstChkInstance
 type ChkInstance struct {
-	Name                     string
-	Title                    *string
-	Def                      *ChkDef
-	ActualParams             []*ActualParam
-	MaterializedFormalParams []*FormalParam
-	Children                 []*ChkInstance
-	IsNegated                bool
-	IsRetrying               bool
-	IsQuery                  bool
-	InstanceID               uint
-	Address                  ContentAddress
+	Name         string
+	Parent       *ChkInstance
+	Title        *string
+	Def          *ChkDef
+	ActualParams *ActualParams
+	Children     []*ChkInstance
+	IsNegated    bool
+	IsRetrying   bool
+	IsQuery      bool
+	InstanceID   uint
+	Address      ContentAddress
 }
 
-type RunEnv struct{}
+func (c *ChkInstance) BuildPath() string {
+	if c.Parent != nil {
+		return fmt.Sprintf("%s.%s", c.Parent.BuildPath(), c.Name)
+	} else {
+		return c.Name
+	}
+}
 
-type ChkFn func(actualParams map[string]*ActualParam, runEnv *RunEnv, chkInst *ChkInstance) *ChkResult
+var nextFileId = 0
+
+type CompiledFileOut struct {
+	Id        int // uint?
+	Filename  string
+	Errors    []error
+	Instances []*ChkInstance
+}
+
+func NewCompiledFileOut(filename string) *CompiledFileOut {
+	id := nextFileId
+	nextFileId++
+	return &CompiledFileOut{
+		Id:       id,
+		Filename: filename,
+	}
+}
+
+func (c *CompiledFileOut) AddError(err error) {
+	c.Errors = append(c.Errors, err)
+}
+
+func (c *CompiledFileOut) AddErrors(errs []error) {
+	c.Errors = append(c.Errors, errs...)
+}
+
+func (c *CompiledFileOut) AddChkInstance(instance *ChkInstance) {
+	c.Instances = append(c.Instances, instance)
+}

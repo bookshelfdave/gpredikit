@@ -9,10 +9,12 @@ all {
     }
 
     // is the file /bin/zsh executable?
+    /*
     test executable? {
       path: "/bin/zsh"
       extra_param:    true
     }
+    */
 
     // is the `zsh` command on the path?
     test on_path? {
@@ -26,21 +28,21 @@ all {
 
     // Only a few operations exist out of the box, but checking open
     // ports and a few other misc networking tests could be useful.
-    test not port_open? {
-        port: 6666
-        // on_* properties are hooks that can run arbitrary shell commands
-        on_pass: "echo 'Development server port is not in use'"
-        on_fail: "echo 'Port 6666 is in use, please stop whatever service is using port 6666'"
-    }
+    //test not port_open? {
+    //    port: 6666
+    //    // on_* properties are hooks that can run arbitrary shell commands
+    //    on_pass: "echo 'Development server port is not in use'"
+    //    on_fail: "echo 'Port 6666 is in use, please stop whatever service is using port 6666'"
+   // }
 
     // Prepending an @ to a test enables automatic retrying until success and makes the `retries` and `retry_delay`
     // properties available in your test.
     // This tests if `localhost:53` is open 10 times with a 1 second + 50 millisecond + 10ns delay (arbitrary, I know)
-    @test port_addr_open? {
-        addr_port: "localhost:53"
-        retries: 10
-        retry_delay: d(1s 50ms 10ns)  // d(..) represents a duration format
-    }
+    //@test port_addr_open? {
+    //    addr_port: "localhost:53"
+    //    retries: 10
+    //    retry_delay: d(1s 50ms 10ns)  // d(..) represents a duration format
+   // }
 }
 
 
@@ -61,6 +63,7 @@ tool pacman_installed? {
     }
 }
 
+/*
 all {
     title: "Check development dependencies using a user-defined tool"
 
@@ -90,5 +93,5 @@ all {
         retries: 2
         retry_delay: d(0ms)  // don't sleep at all
     }
-
 }
+*/
