@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/antlr4-go/antlr/v4"
-	"github.com/bookshelfdave/gpredikit/functions"
 	"github.com/bookshelfdave/gpredikit/parser"
 
 	rt "github.com/bookshelfdave/gpredikit/runtime"
@@ -112,8 +111,8 @@ func (tsl *TreeShapeListener) ExitPk_group(ctx *parser.Pk_groupContext) {
 			app := v
 			if _, ok := actualParams[app.Name]; ok {
 				// parameter defined multiple times!
-				tsl.AddError(fmt.Errorf("Parameter %s appears multiple times in file %s at line %d, col %d",
-					app.Name, tsl.Filename, aggFn.Address.Line, aggFn.Address.Col))
+				tsl.AddError(fmt.Errorf("Parameter %s appears multiple times in %s",
+					app.Name, aggFn.Address))
 
 			}
 			actualParams[app.Name] = app
@@ -199,8 +198,8 @@ func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 		v := tsl.TreeProps[ap]
 		app := v.(*rt.ActualParam)
 		if _, ok := actualParams[app.Name]; ok {
-			tsl.AddError(fmt.Errorf("Parameter %s appears multiple times in file %s at line %d, col %d",
-				app.Name, tsl.Filename, address.Line, address.Col))
+			tsl.AddError(fmt.Errorf("Parameter %s appears multiple times in %s",
+				app.Name, address))
 		} else {
 			actualParams[app.Name] = app
 		}
@@ -320,8 +319,7 @@ func DumpAstObject(o any) {
 	spew.Dump(o)
 }
 
-func Run() {
-	filename := "./checks/first.pk"
+func Walk(filename string) (*AstFile, error) {
 	fmt.Printf("Compiling %s\n", filename)
 
 	input, _ := antlr.NewFileStream(filename)
@@ -331,46 +329,19 @@ func Run() {
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 	tree := p.Pk_toplevel()
 	tsl := NewTreeShapeListener(filename)
+
 	antlr.ParseTreeWalkerDefault.Walk(tsl, tree)
+
 	if len(tsl.Errors) > 0 {
 		for _, e := range tsl.Errors {
 			// TODO: figure out where / how to write errors
 			fmt.Printf("Compile error: %s\n", e)
 		}
-		return
+		return nil, fmt.Errorf("Compilation failed")
 	}
-	astFile := AstFile{
+	return &AstFile{
 		Filename: filename,
 		Checks:   tsl.TopLevelChecks,
 		Tools:    tsl.ToolDefs,
-	}
-
-	// TODO: move everything below
-	allAstFiles := []*AstFile{&astFile}
-	reg := rt.NewChkRegistry()
-	functions.RegisterBuiltins(reg)
-
-	compiledAstFiles := CompileChecksToAsts(allAstFiles, reg)
-
-	for _, cfo := range compiledAstFiles {
-		for _, err := range cfo.Errors {
-			fmt.Printf("Error: %s\n", err)
-		}
-		if len(cfo.Errors) != 0 {
-			// run all checks
-			return
-		}
-	}
-
-	runEnv := &rt.RunEnv{}
-	for _, cfo := range compiledAstFiles {
-		fmt.Printf("Running checks from %s\n", cfo.Filename)
-		for _, inst := range cfo.Instances {
-			fmt.Printf("Running check %s\n", inst.BuildPath())
-
-			result := rt.RunCheckMaybeRetry(inst, runEnv)
-			fmt.Printf("Result = %#v\n", result)
-
-		}
-	}
+	}, nil
 }

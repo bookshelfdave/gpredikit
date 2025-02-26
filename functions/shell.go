@@ -22,7 +22,7 @@ func DefShell() *rt.ChkDef {
 			if err := exec.CommandContext(ctx, "bash", "-c", cmd).Run(); err != nil {
 				fmt.Printf("fn err %s\n", err)
 				return &rt.ChkResult{
-					TestResult: false,
+					PassFail: false,
 					Err:        err,
 				}
 			} else {

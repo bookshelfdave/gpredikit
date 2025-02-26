@@ -28,16 +28,19 @@ func defGroupAll() *rt.ChkDef {
 	return &rt.ChkDef{
 		Name: "all",
 		CheckFunction: func(actualParams *rt.ActualParams, runEnv *rt.RunEnv, parent *rt.ChkInstance) *rt.ChkResult {
-			childResults := []*rt.ChkResult{}
 			failures := false
 			for _, inst := range parent.Children {
-				fmt.Printf("Running check %s\n", inst.BuildPath())
-				childResult := rt.RunCheckMaybeRetry(inst, runEnv)
-				fmt.Printf("Child result %+v\n", childResult)
-				if !childResult.TestResult {
+				title, has_title := inst.GetTitle()
+				if has_title {
+					fmt.Printf("Check '%s' %s\n", title, inst.BuildPath())
+				} else {
+					fmt.Printf("Check %s\n", inst.BuildPath())
+				}
+
+				rt.RunCheckMaybeRetry(inst, runEnv)
+				if !inst.Result.PassFail {
 					failures = true
 				}
-				childResults = append(childResults, childResult)
 			}
 			if failures {
 				return rt.ResFail()
@@ -55,14 +58,12 @@ func defGroupAny() *rt.ChkDef {
 	return &rt.ChkDef{
 		Name: "any",
 		CheckFunction: func(actualParams *rt.ActualParams, runEnv *rt.RunEnv, parent *rt.ChkInstance) *rt.ChkResult {
-			childResults := []*rt.ChkResult{}
 			passes := false
 			for _, inst := range parent.Children {
-				childResult := rt.RunCheckMaybeRetry(inst, runEnv)
-				if childResult.TestResult {
+				rt.RunCheckMaybeRetry(inst, runEnv)
+				if inst.Result.PassFail {
 					passes = true
 				}
-				childResults = append(childResults, childResult)
 			}
 			if passes {
 				return rt.ResPass()
@@ -80,14 +81,11 @@ func defGroupNone() *rt.ChkDef {
 	return &rt.ChkDef{
 		Name: "none",
 		CheckFunction: func(actualParams *rt.ActualParams, runEnv *rt.RunEnv, parent *rt.ChkInstance) *rt.ChkResult {
-			childResults := []*rt.ChkResult{}
 			passes := false
 			for _, inst := range parent.Children {
-				childResult := rt.RunCheckMaybeRetry(inst, runEnv)
-				if childResult.TestResult {
+				if inst.Result.PassFail {
 					passes = true
 				}
-				childResults = append(childResults, childResult)
 			}
 			if passes {
 				return rt.ResFail()

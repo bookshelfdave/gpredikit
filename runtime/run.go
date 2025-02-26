@@ -2,23 +2,24 @@ package runtime
 
 import "fmt"
 
-func RunCheckNoRetry(inst *ChkInstance, runEnv *RunEnv) *ChkResult {
+func RunCheckNoRetry(inst *ChkInstance, runEnv *RunEnv) {
 	// TODO: RUN HOOK INIT
 
-	result := inst.Def.CheckFunction(inst.ActualParams, runEnv, inst)
-
+	result := inst.Run(runEnv)
+	inst.Result = result
 	// TODO: RUN PASS / FAIL / ERROR hooks
 
 	// TODO: RUN HOOK TERM
-	return result
 }
 
-func RunCheckMaybeRetry(inst *ChkInstance, runEnv *RunEnv) *ChkResult {
+func RunCheckMaybeRetry(inst *ChkInstance, runEnv *RunEnv) {
+	runEnv.Formatter.CheckStart(inst)
 	if !inst.IsRetrying {
 		RunCheckNoRetry(inst, runEnv)
 	} else {
 		fmt.Println("Retries not implemented, sorry!")
 		RunCheckNoRetry(inst, runEnv)
 	}
-	return ResOk(true)
+	runEnv.Formatter.CheckEnd(inst)
+	return
 }

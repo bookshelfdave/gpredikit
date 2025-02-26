@@ -4,9 +4,6 @@ import (
 	rt "github.com/bookshelfdave/gpredikit/runtime"
 )
 
-func ProcessInputFiles() {
-	Run()
-}
 
 type AstFile struct {
 	Filename string

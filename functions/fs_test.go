@@ -17,7 +17,7 @@ func TestFileExists(t *testing.T) {
 	instance := &rt.ChkInstance{}
 
 	result := cd.CheckFunction(actualParams, runEnv, instance)
-	if !result.TestResult {
+	if !result.PassFail {
 		t.Fail()
 	}
 }
@@ -32,7 +32,7 @@ func TestIsDir(t *testing.T) {
 	instance := &rt.ChkInstance{}
 
 	result := cd.CheckFunction(actualParams, runEnv, instance)
-	if !result.TestResult {
+	if !result.PassFail {
 		t.Fail()
 	}
 }
@@ -47,7 +47,7 @@ func TestIsFile(t *testing.T) {
 	instance := &rt.ChkInstance{}
 
 	result := cd.CheckFunction(actualParams, runEnv, instance)
-	if !result.TestResult {
+	if !result.PassFail {
 		t.Fail()
 	}
 }
@@ -63,7 +63,7 @@ func TestOnPath(t *testing.T) {
 
 	result := cd.CheckFunction(actualParams, runEnv, instance)
 
-	if !result.TestResult {
+	if !result.PassFail {
 		t.Fail()
 	}
 }

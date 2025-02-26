@@ -8,9 +8,10 @@ Rewrite of Predikit in Golang
 
 ## TODO
 
-- [ ] lots of stuff
+- [ ] move all error handling "to the top" (or at least in one place)
 - [ ] Path type + env var handling
 - [ ] acceptsChildren for groups
+- [ ] terminology: test / check / assert
 
 # License
 

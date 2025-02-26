@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/bookshelfdave/gpredikit/functions"
 	rt "github.com/bookshelfdave/gpredikit/runtime"
 )
 
@@ -98,8 +99,8 @@ func instantiateDefaultParams(inst *rt.ChkInstance) []error {
 func isValidFunctionName(chk *AstChkInstance, reg *rt.ChkRegistry) error {
 	name := chk.FnName
 	if !reg.IsValidFn(name) {
-		err := fmt.Errorf("Unknown function '%s' specified at %s:%d:%d",
-			chk.FnName, chk.Address.Filename, chk.Address.Line, chk.Address.Col)
+		err := fmt.Errorf("Unknown function '%s' specified at %s",
+			chk.FnName, chk.Address)
 		return err
 	}
 
@@ -151,11 +152,11 @@ func materializeFormalParams(inst *rt.ChkInstance) []error {
 }
 
 func CompileChecksToAsts(astFiles []*AstFile, reg *rt.ChkRegistry) []*rt.CompiledFileOut {
-	allCfos := []*rt.CompiledFileOut{}
+	allCfos := make([]*rt.CompiledFileOut, len(astFiles))
 
-	for _, astFile := range astFiles {
+	for n, astFile := range astFiles {
 		cfo := rt.NewCompiledFileOut(astFile.Filename)
-		allCfos = append(allCfos, cfo)
+		allCfos[n] = cfo
 		for _, checkDef := range astFile.Checks {
 			inst, err := makeCheckInstance(checkDef, reg, nil)
 			if err != nil {
@@ -174,4 +175,57 @@ func CompileChecksToAsts(astFiles []*AstFile, reg *rt.ChkRegistry) []*rt.Compile
 		}
 	}
 	return allCfos
+}
+
+// TODO move this somewhere else
+func RunChecks(compiledAstFiles []*rt.CompiledFileOut, formatter rt.OutputFormatter) {
+	runEnv := &rt.RunEnv{Formatter: formatter}
+	runEnv.Formatter.Init()
+	for _, cfo := range compiledAstFiles {
+		for _, inst := range cfo.Instances {
+			// title, has_title := inst.GetTitle()
+			// if has_title {
+			// 	fmt.Printf("Check '%s' %s: ", title, inst.BuildPath())
+			// } else {
+			// 	fmt.Printf("Check %s: ", inst.BuildPath())
+			// }
+			rt.RunCheckMaybeRetry(inst, runEnv)
+		}
+	}
+	runEnv.Formatter.Term()
+}
+
+func CompileInputFiles(inFiles []string) []*rt.CompiledFileOut {
+	allAstFiles := make([]*AstFile, len(inFiles))
+	for n, inFile := range inFiles {
+		// build an ast for each file, collect them in allAstFiles
+		astFile, err := Walk(inFile)
+		if err != nil {
+			fmt.Printf("%s\n", err)
+		}
+		// keep gathering compilation errors without exiting
+		allAstFiles[n] = astFile
+	}
+
+	reg := rt.NewChkRegistry()
+	functions.RegisterBuiltins(reg)
+	compiledAstFiles := CompileChecksToAsts(allAstFiles, reg)
+
+	errorsDetected := false
+	for _, cfo := range compiledAstFiles {
+		for _, err := range cfo.Errors {
+			fmt.Printf("Error: %s\n", err)
+		}
+		if len(cfo.Errors) != 0 {
+			// compilation can't finish, but show all the compilation errors before exiting
+			errorsDetected = true
+		}
+	}
+
+	if errorsDetected {
+		return nil
+	}
+
+	return compiledAstFiles
+
 }

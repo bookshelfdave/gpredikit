@@ -1,8 +1,56 @@
 package runtime
 
-import "fmt"
+import (
+	"fmt"
+	"log/slog"
 
-type RunEnv struct{}
+	"github.com/logrusorgru/aurora/v4"
+)
+
+type OutputFormatter interface {
+	Init()
+	CheckStart(cd *ChkInstance)
+	CheckEnd(cd *ChkInstance)
+	Term()
+}
+
+type DefaultOutputFormatter struct {
+	au *aurora.Aurora
+}
+
+func NewDefaultOutputFormatter() DefaultOutputFormatter {
+	return DefaultOutputFormatter{
+		au: aurora.New(aurora.WithColors(true)),
+	}
+}
+
+func (f DefaultOutputFormatter) Init() {
+}
+
+func (f DefaultOutputFormatter) CheckStart(cd *ChkInstance) {
+	fmt.Printf("Starting check %s: ", cd.Name)
+}
+
+func (f DefaultOutputFormatter) CheckEnd(cd *ChkInstance) {
+
+	if cd.Result.Err != nil {
+		fmt.Printf("error %+v", cd.Result.Err)
+	} else {
+		if cd.Result.PassFail {
+			fmt.Println(f.au.Green("PASS"))
+		} else {
+			fmt.Println(f.au.Red("FAIL"))
+
+		}
+	}
+}
+
+func (f DefaultOutputFormatter) Term() {
+}
+
+type RunEnv struct {
+	Formatter OutputFormatter
+}
 
 type ChkFn func(actualParams *ActualParams, runEnv *RunEnv, chkInst *ChkInstance) *ChkResult
 
@@ -43,33 +91,33 @@ type ChkOutput struct {
 }
 
 type ChkResult struct {
-	TestResult bool
-	Err        error
-	Output     *ChkOutput
+	PassFail bool
+	Err      error
+	Output   *ChkOutput
 }
 
 func ResOk(res bool) *ChkResult {
 	return &ChkResult{
-		TestResult: res,
+		PassFail: res,
 	}
 }
 
 func ResPass() *ChkResult {
 	return &ChkResult{
-		TestResult: true,
+		PassFail: true,
 	}
 }
 
 func ResFail() *ChkResult {
 	return &ChkResult{
-		TestResult: false,
+		PassFail: false,
 	}
 }
 
 func ResError(err error) *ChkResult {
 	return &ChkResult{
-		TestResult: false,
-		Err:        err,
+		PassFail: false,
+		Err:      err,
 	}
 }
 
@@ -77,7 +125,6 @@ func ResError(err error) *ChkResult {
 type ChkInstance struct {
 	Name         string
 	Parent       *ChkInstance
-	Title        *string
 	Def          *ChkDef
 	ActualParams *ActualParams
 	Children     []*ChkInstance
@@ -86,13 +133,33 @@ type ChkInstance struct {
 	IsQuery      bool
 	InstanceID   uint
 	Address      ContentAddress
+	Result       *ChkResult
 }
 
-func (c *ChkInstance) BuildPath() string {
-	if c.Parent != nil {
-		return fmt.Sprintf("%s.%s", c.Parent.BuildPath(), c.Name)
+func (inst *ChkInstance) BuildPath() string {
+	if inst.Parent != nil {
+		return fmt.Sprintf("%s.%s", inst.Parent.BuildPath(), inst.Name)
 	} else {
-		return c.Name
+		return inst.Name
+	}
+}
+
+func (inst *ChkInstance) Run(runEnv *RunEnv) *ChkResult {
+	return inst.Def.CheckFunction(inst.ActualParams, runEnv, inst)
+}
+
+func (inst *ChkInstance) GetTitle() (string, bool) {
+	if t, ok := inst.ActualParams.Get("title"); ok {
+		if ts, err := t.GetString(); err != nil {
+			slog.Warn("Type error while getting 'title' for %s at file %s %d:%d", inst.Name, inst.Address.Filename,
+				inst.Address.Line, inst.Address.Col)
+			return "", false
+		} else {
+			return ts, true
+		}
+
+	} else {
+		return "", false
 	}
 }
 
