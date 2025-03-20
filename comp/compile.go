@@ -26,7 +26,7 @@ func (ce *CompileErrors) AddError(e error) {
 func typecheckParams(inst *rt.ChkInstance) []error {
 	var errors []error
 	// 1) check for required params
-	// 		- sort not found errors
+	// TODO? sort not found errors
 
 	for _, fp := range inst.Def.FormalParams {
 		if fp.Required {
@@ -46,9 +46,12 @@ func typecheckParams(inst *rt.ChkInstance) []error {
 	}
 
 	// 3) check for param types
-	for apName, apValue := range inst.ActualParams.Params {
-		if formalParam, ok := inst.Def.FormalParams[apName]; ok {
-			if formalParam.ParamType != apValue.ParamType {
+	for actualParamValue, apValue := range inst.ActualParams.Params {
+		if formalParam, ok := inst.Def.FormalParams[actualParamValue]; ok {
+			if formalParam.CoercibleFromString() && apValue.CoercibleToString() {
+				fmt.Println("Duration to string")
+				// pass
+			} else if formalParam.ParamType != apValue.ParamType {
 				err := fmt.Errorf("Expected type %s for parameter %s of check %s, got %s instead on line %d col %d",
 					formalParam.ParamType, formalParam.Name, inst.Name, apValue.ParamType, inst.Address.Line, inst.Address.Col)
 				errors = append(errors, err)
@@ -58,6 +61,14 @@ func typecheckParams(inst *rt.ChkInstance) []error {
 			slog.Warn("Unhandled type param case")
 		}
 	}
+
+	for _, child := range inst.Children {
+		childErrors := typecheckParams(child)
+		if len(childErrors) > 0 {
+			errors = append(errors, childErrors...)
+		}
+	}
+
 	return errors
 }
 
@@ -83,7 +94,7 @@ func instantiateDefaultParams(inst *rt.ChkInstance) []error {
 				case rt.ParamTypeString:
 					ap = rt.NewUnnamedParamString(fp.Default.(string))
 				case rt.ParamTypeTypeName:
-					ap = rt.NewUnnamedParamTypeName(fp.Default.(string))
+					ap = rt.NewUnnamedParamTypeName(fp.Default.(rt.ParamTypeName))
 				default:
 					errors = append(errors, fmt.Errorf("unexpected runtime.ParamTypeName: %#v", fp.ParamType))
 				}
@@ -93,6 +104,15 @@ func instantiateDefaultParams(inst *rt.ChkInstance) []error {
 			} /* else { errors for missing required params are caught in another function } */
 		}
 	}
+
+	// recursively instantiate default params for children
+	for _, child := range inst.Children {
+		childErrors := instantiateDefaultParams(child)
+		if len(childErrors) > 0 {
+			errors = append(errors, childErrors...)
+		}
+	}
+
 	return errors
 }
 
@@ -123,11 +143,6 @@ func makeCheckInstance(chk *AstChkInstance, reg *rt.ChkRegistry, parent *rt.ChkI
 	newInst.IsNegated = chk.IsNegated
 	newInst.Address = chk.Address
 
-	//newInst.IsQuery = chk.Is
-	//newInst.InstanceID
-	//newInst.Title
-
-	// try to make all children first
 	for _, child := range chk.Children {
 		childInst, err := makeCheckInstance(child, reg, newInst)
 		if err != nil {
@@ -139,16 +154,93 @@ func makeCheckInstance(chk *AstChkInstance, reg *rt.ChkRegistry, parent *rt.ChkI
 	return newInst, nil
 }
 
-func materializeFormalParams(inst *rt.ChkInstance) []error {
+func materializeFormalParams(cd *rt.ChkDef) []error {
 	var errors []error
-	for _, mp := range META_PARAMS {
-		if _, ok := inst.Def.FormalParams[mp.Name]; ok {
-			err := fmt.Errorf("Meta param key %s already exists in %s", mp.Name, inst.Name)
+	addMatParam := func(mp rt.FormalParam) {
+		if _, ok := cd.FormalParams[mp.Name]; ok {
+			err := fmt.Errorf("Meta param key %s already exists in %s", mp.Name, cd.Name)
 			errors = append(errors, err)
 		}
-		inst.Def.FormalParams[mp.Name] = &mp
+		cd.FormalParams[mp.Name] = &mp
+	}
+	for _, mp := range META_PARAMS {
+		addMatParam(mp)
+	}
+
+	for _, mp := range RETRY_PARAMS {
+		addMatParam(mp)
 	}
 	return errors
+}
+
+func _collectSetOfDefs(node *rt.ChkInstance, defs map[string]*rt.ChkDef) {
+	defs[node.Def.Name] = node.Def
+	for _, child := range node.Children {
+		_collectSetOfDefs(child, defs)
+	}
+}
+
+func collectSetOfDefs(root *rt.ChkInstance) map[string]*rt.ChkDef {
+	defs := map[string]*rt.ChkDef{}
+	_collectSetOfDefs(root, defs)
+	return defs
+}
+
+func CompileTools(tools []*AstToolDef) []error {
+	allErrors := []error{}
+
+	for _, toolDef := range tools {
+		fmt.Printf("COMPILING TOOL %+v\n", toolDef)
+		for paramName, paramParams := range toolDef.RuntimeParams {
+			// runtime params get turned into FormalParams
+			fmt.Printf("---%s\n", paramName)
+			fmt.Printf("%+v\n", paramParams)
+			required := false
+
+			// make sure "type" is specified
+			if _, ok := paramParams["type"]; !ok {
+				err := fmt.Errorf("Parameter 'type' for %v required at %s", paramName, toolDef.Address.Render())
+				allErrors = append(allErrors, err)
+				continue
+			}
+
+			// make sure "type" is a TypeName
+			if paramParams["type"].ParamType != rt.ParamTypeTypeName {
+				err := fmt.Errorf("Invalid type for parameter 'type' at %s",
+					paramParams["type"].Address.Render())
+				allErrors = append(allErrors, err)
+				continue
+			}
+
+			theType, _ := paramParams["type"].GetTypeName()
+
+			// the "required" parameter value is optional
+			if _, ok := paramParams["required"]; ok {
+				// but make sure it's a Bool
+				if paramParams["required"].ParamType != rt.ParamTypeBool {
+					err := fmt.Errorf("Invalid type for parameter 'required' at %s",
+						paramParams["required"].Address.Render())
+					allErrors = append(allErrors, err)
+					continue
+				} else {
+					required, _ = paramParams["required"].GetBool()
+				}
+			}
+			fmt.Printf("Required = %t\n", required)
+			fmt.Printf("The type = %+v\n", theType)
+		}
+
+		// td := rt.ToolDef{
+		// 	Name:             toolDef.ToolName,
+		// 	RuntimeParams:    map[string]*rt.FormalParam{},
+		// 	DesignTimeParams: map[string]*rt.ActualParam{},
+		// }
+	}
+
+	for _, err := range allErrors {
+		fmt.Println(err)
+	}
+	return allErrors
 }
 
 func CompileChecksToAsts(astFiles []*AstFile, reg *rt.ChkRegistry) []*rt.CompiledFileOut {
@@ -163,16 +255,24 @@ func CompileChecksToAsts(astFiles []*AstFile, reg *rt.ChkRegistry) []*rt.Compile
 				cfo.AddError(err)
 				continue
 			}
-			if errors := materializeFormalParams(inst); errors != nil {
-				cfo.AddErrors(errors)
+			setOfDefs := collectSetOfDefs(inst)
+			for _, def := range setOfDefs {
+				if errors := materializeFormalParams(def); errors != nil {
+					cfo.AddErrors(errors)
+				}
 			}
+			// TODO: THIS NEEDS TO BE RECURSIVE
 			defaultParamErrors := instantiateDefaultParams(inst)
+
 			cfo.AddErrors(defaultParamErrors)
 			typecheckErrors := typecheckParams(inst)
+
 			cfo.AddErrors(typecheckErrors)
 
 			cfo.AddChkInstance(inst)
 		}
+
+		CompileTools(astFile.Tools)
 	}
 	return allCfos
 }
@@ -183,13 +283,7 @@ func RunChecks(compiledAstFiles []*rt.CompiledFileOut, formatter rt.OutputFormat
 	runEnv.Formatter.Init()
 	for _, cfo := range compiledAstFiles {
 		for _, inst := range cfo.Instances {
-			// title, has_title := inst.GetTitle()
-			// if has_title {
-			// 	fmt.Printf("Check '%s' %s: ", title, inst.BuildPath())
-			// } else {
-			// 	fmt.Printf("Check %s: ", inst.BuildPath())
-			// }
-			rt.RunCheckMaybeRetry(inst, runEnv)
+			rt.RunCheck(inst, runEnv)
 		}
 	}
 	runEnv.Formatter.Term()

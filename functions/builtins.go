@@ -1,8 +1,6 @@
 package functions
 
 import (
-	"fmt"
-
 	rt "github.com/bookshelfdave/gpredikit/runtime"
 )
 
@@ -17,6 +15,9 @@ func RegisterBuiltins(reg *rt.ChkRegistry) {
 	reg.RegisterFn(defTrue())
 	reg.RegisterFn(defFalse())
 
+	// net stuff
+	reg.RegisterFn(defPortOpen())
+
 	// everything else
 	reg.RegisterFn(defFileExists())
 	reg.RegisterFn(defOnPath())
@@ -30,14 +31,7 @@ func defGroupAll() *rt.ChkDef {
 		CheckFunction: func(actualParams *rt.ActualParams, runEnv *rt.RunEnv, parent *rt.ChkInstance) *rt.ChkResult {
 			failures := false
 			for _, inst := range parent.Children {
-				title, has_title := inst.GetTitle()
-				if has_title {
-					fmt.Printf("Check '%s' %s\n", title, inst.BuildPath())
-				} else {
-					fmt.Printf("Check %s\n", inst.BuildPath())
-				}
-
-				rt.RunCheckMaybeRetry(inst, runEnv)
+				rt.RunCheck(inst, runEnv)
 				if !inst.Result.PassFail {
 					failures = true
 				}
@@ -60,7 +54,7 @@ func defGroupAny() *rt.ChkDef {
 		CheckFunction: func(actualParams *rt.ActualParams, runEnv *rt.RunEnv, parent *rt.ChkInstance) *rt.ChkResult {
 			passes := false
 			for _, inst := range parent.Children {
-				rt.RunCheckMaybeRetry(inst, runEnv)
+				rt.RunCheck(inst, runEnv)
 				if inst.Result.PassFail {
 					passes = true
 				}
@@ -101,7 +95,7 @@ func defGroupNone() *rt.ChkDef {
 
 func defTrue() *rt.ChkDef {
 	return &rt.ChkDef{
-		Name: "true",
+		Name: "always_true",
 		CheckFunction: func(actualParams *rt.ActualParams, runEnv *rt.RunEnv, parent *rt.ChkInstance) *rt.ChkResult {
 			return rt.ResOk(true)
 		},
@@ -113,7 +107,7 @@ func defTrue() *rt.ChkDef {
 
 func defFalse() *rt.ChkDef {
 	return &rt.ChkDef{
-		Name: "false",
+		Name: "always_false",
 		CheckFunction: func(actualParams *rt.ActualParams, runEnv *rt.RunEnv, parent *rt.ChkInstance) *rt.ChkResult {
 			return rt.ResOk(false)
 		},

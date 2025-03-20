@@ -55,6 +55,15 @@ func (fp *FormalParam) String() string {
 	}
 }
 
+func (fp *FormalParam) CoercibleFromString() bool {
+	switch fp.ParamType {
+	case ParamTypeDuration:
+		return true
+	default:
+		return false
+	}
+}
+
 type FormalParamsBuilder struct {
 	fps map[string]*FormalParam
 }
@@ -160,7 +169,7 @@ func (builder *FormalParamsBuilder) WithRequiredTypeName(name string) *FormalPar
 	return builder
 }
 
-func (builder *FormalParamsBuilder) WithOptionalTypeName(name string, defaultValue string) *FormalParamsBuilder {
+func (builder *FormalParamsBuilder) WithOptionalTypeName(name string, defaultValue ParamTypeName) *FormalParamsBuilder {
 	builder.fps[name] = &FormalParam{
 		Name:      name,
 		Required:  false,
@@ -200,6 +209,37 @@ func (ap *ActualParams) GetStringOrDefault(name string) (string, error) {
 	return fp.Default.(string), nil
 }
 
+func (ap *ActualParams) GetIntOrDefault(name string) (int, error) {
+	v, ok := ap.Params[name]
+	if ok {
+		return v.GetInt()
+	}
+
+	// param name not in actual params, try getting the default
+	fp, ok := ap.Def.FormalParams[name]
+	if !ok {
+		msg := fmt.Errorf("Unknown parameter %s", name)
+		return 0, msg
+	}
+	return fp.Default.(int), nil
+}
+
+func (ap *ActualParams) GetDurationOrDefault(name string) (time.Duration, error) {
+	v, ok := ap.Params[name]
+	if ok {
+		return v.GetDuration()
+	}
+
+	// param name not in actual params, try getting the default
+	fmt.Printf("FORMAL PARAMS = %+v\n", ap.Def.FormalParams)
+	fp, ok := ap.Def.FormalParams[name]
+	if !ok {
+		msg := fmt.Errorf("Unknown parameter %s", name)
+		return 0, msg
+	}
+	return fp.Default.(time.Duration), nil
+}
+
 type ActualParam struct {
 	Name      string
 	ParamType ParamTypeName
@@ -208,21 +248,22 @@ type ActualParam struct {
 	i       *int
 	b       *bool
 	d       *time.Duration
+	tn      *ParamTypeName
 	Address ContentAddress
 }
 
 func (ap *ActualParam) String() string {
 	switch ap.ParamType {
 	case ParamTypeString:
-		return fmt.Sprintf("(String %q)", *ap.s)
+		return fmt.Sprintf("(%s: String %s)", ap.Name, *ap.s)
 	case ParamTypeInt:
-		return fmt.Sprintf("(Int %d)", *ap.i)
+		return fmt.Sprintf("(%s: Int %d)", ap.Name, *ap.i)
 	case ParamTypeBool:
-		return fmt.Sprintf("(Bool %t)", *ap.b)
+		return fmt.Sprintf("(%s: Bool %t)", ap.Name, *ap.b)
 	case ParamTypeDuration:
-		return fmt.Sprintf("(Duration %d)", *ap.d)
+		return fmt.Sprintf("(%s: Duration %d)", ap.Name, *ap.d)
 	case ParamTypeTypeName:
-		return fmt.Sprintf("(TypeName %q)", *ap.s)
+		return fmt.Sprintf("(%s: TypeName %s)", ap.Name, *ap.tn)
 	default:
 		return fmt.Sprintf("(Unknown %s)", ap.ParamType)
 	}
@@ -245,6 +286,14 @@ func MakeTestParams(cd *ChkDef, p TestParams) *ActualParams {
 		}
 	}
 	return builder.Build(cd)
+}
+func (ap *ActualParam) CoercibleToString() bool {
+	switch ap.ParamType {
+	case ParamTypeDuration:
+		return true
+	default:
+		return false
+	}
 }
 
 // Useful for testing
@@ -299,8 +348,8 @@ func NewUnnamedParamDuration(newD time.Duration) *ActualParam {
 	return &ActualParam{d: &newD, ParamType: ParamTypeDuration}
 }
 
-func NewUnnamedParamTypeName(newS string) *ActualParam {
-	return &ActualParam{s: &newS, ParamType: ParamTypeTypeName}
+func NewUnnamedParamTypeName(newTN ParamTypeName) *ActualParam {
+	return &ActualParam{tn: &newTN, ParamType: ParamTypeTypeName}
 }
 
 func (ap *ActualParam) GetString() (string, error) {
@@ -308,6 +357,13 @@ func (ap *ActualParam) GetString() (string, error) {
 		return "", fmt.Errorf("cannot get string value from param of type %s", ap.ParamType)
 	}
 	return *ap.s, nil
+}
+
+func (ap *ActualParam) GetTypeName() (ParamTypeName, error) {
+	if ap.ParamType != ParamTypeTypeName {
+		return 0, fmt.Errorf("cannot get typename value from param of type %s", ap.ParamType)
+	}
+	return *ap.tn, nil
 }
 
 func (ap *ActualParam) GetInt() (int, error) {
@@ -329,4 +385,21 @@ func (ap *ActualParam) GetDuration() (time.Duration, error) {
 		return 0, fmt.Errorf("cannot get duration value from param of type %s", ap.ParamType)
 	}
 	return *ap.d, nil
+}
+
+func TypeNameToType(s string) (ParamTypeName, error) {
+	switch s {
+	case "String":
+		return ParamTypeString, nil
+	case "Int":
+		return ParamTypeInt, nil
+	case "Bool":
+		return ParamTypeBool, nil
+	case "Duration":
+		return ParamTypeDuration, nil
+	case "TypeName":
+		return ParamTypeTypeName, nil
+	default:
+		return ParamTypeString, fmt.Errorf("unknown type name: %s", s)
+	}
 }

@@ -56,6 +56,12 @@ func (s *BasePredikitListener) EnterPk_test(ctx *Pk_testContext) {}
 // ExitPk_test is called when production pk_test is exited.
 func (s *BasePredikitListener) ExitPk_test(ctx *Pk_testContext) {}
 
+// EnterPk_test_pred is called when production pk_test_pred is entered.
+func (s *BasePredikitListener) EnterPk_test_pred(ctx *Pk_test_predContext) {}
+
+// ExitPk_test_pred is called when production pk_test_pred is exited.
+func (s *BasePredikitListener) ExitPk_test_pred(ctx *Pk_test_predContext) {}
+
 // EnterPk_tool is called when production pk_tool is entered.
 func (s *BasePredikitListener) EnterPk_tool(ctx *Pk_toolContext) {}
 

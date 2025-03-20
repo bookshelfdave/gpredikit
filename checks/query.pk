@@ -1,0 +1,11 @@
+all {
+
+    test version? {
+        foo: "test"
+    } = "1.0"
+
+    test foo? {
+        foo: "test"
+    } =~ "1.*"
+
+}

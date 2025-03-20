@@ -167,7 +167,8 @@ func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_pa
 		if err != nil {
 			// this would happen if you pass a massive number in as an int
 			// TODO: check min/max parseable values
-			msg := fmt.Sprintf("Cannot parse number at %d:%d", ctx.GetVi().GetLine(), ctx.GetVi().GetColumn())
+			msg := fmt.Sprintf("Cannot parse number at %s line %d col %d",
+				tsl.Filename, ctx.GetVi().GetLine(), ctx.GetVi().GetColumn())
 			tsl.AddError(errors.New(msg))
 			// return a valid value, the upstream compiler code will check for an empty
 			// list of errors to see if it can continue
@@ -185,6 +186,9 @@ func (tsl *TreeShapeListener) ExitPk_actual_param_value(ctx *parser.Pk_actual_pa
 		retval = rt.NewUnnamedParamBool(v)
 	} else if ctx.GetVc() != nil {
 		// NOT IMPLEMENTED, THIS JUST RETURNS THE ENTIRE STRING
+		convStr := ctx.GetVc().GetText()
+		fmt.Printf("Conversion string [%s]\n", convStr)
+
 		retval = rt.NewUnnamedParamString(ctx.GetVc().GetText())
 	}
 	tsl.TreeProps[ctx] = retval
@@ -223,20 +227,20 @@ func (tsl *TreeShapeListener) ExitPk_test(ctx *parser.Pk_testContext) {
 
 func (tsl *TreeShapeListener) ExitPk_tool(ctx *parser.Pk_toolContext) {
 	td := &AstToolDef{
-		ToolName:       ctx.GetTool_name().GetText(),
-		ClassParams:    []*rt.ActualParam{},
-		InstanceParams: map[string][]*rt.ActualParam{},
-		Address:        tsl.MakeAddress(ctx.GetTool_name()),
+		ToolName:         ctx.GetTool_name().GetText(),
+		DesignTimeParams: []*rt.ActualParam{},
+		RuntimeParams:    map[string]map[string]*rt.ActualParam{},
+		Address:          tsl.MakeAddress(ctx.GetTool_name()),
 	}
 
 	for _, toolChild := range ctx.GetKids() {
 		v := tsl.TreeProps[toolChild]
 		switch v := v.(type) {
 		case *rt.ActualParam:
-			td.ClassParams = append(td.ClassParams, v)
+			td.DesignTimeParams = append(td.DesignTimeParams, v)
 		case *AstToolInstanceParam:
 			ip := v
-			td.InstanceParams[ip.ParamName] = ip.ParamsProps
+			td.RuntimeParams[ip.ParamName] = ip.ParamsProps
 		}
 	}
 	tsl.TreeProps[ctx] = td
@@ -254,10 +258,10 @@ func (tsl *TreeShapeListener) ExitPk_tool_child(ctx *parser.Pk_tool_childContext
 
 func (tsl *TreeShapeListener) ExitPk_tool_metaparam(ctx *parser.Pk_tool_metaparamContext) {
 	paramName := ctx.GetTool_param_name().GetText()
-	paramProps := make([]*rt.ActualParam, 0)
+	paramProps := make(map[string]*rt.ActualParam)
 	for _, tap := range ctx.GetTool_actual_params() {
-		ap := tsl.TreeProps[tap]
-		paramProps = append(paramProps, ap.(*rt.ActualParam))
+		ap := tsl.TreeProps[tap].(*rt.ActualParam)
+		paramProps[ap.Name] = ap
 	}
 	ips := &AstToolInstanceParam{
 		ParamName:   paramName,
@@ -307,7 +311,16 @@ func (tsl *TreeShapeListener) ExitPk_tool_actual_param_value(ctx *parser.Pk_tool
 		// NOT IMPLEMENTED, THIS JUST RETURNS THE ENTIRE STRING
 		retval = rt.NewUnnamedParamString(ctx.GetVc().GetText())
 	} else if ctx.GetVtn() != nil {
-		retval = rt.NewUnnamedParamTypeName(ctx.GetVtn().GetText())
+		tn, err := rt.TypeNameToType(ctx.GetVtn().GetText())
+		if err != nil {
+			msg := fmt.Errorf("Invalid type name at %s line %d col %d (%w)",
+				tsl.Filename, ctx.GetVtn().GetLine(), ctx.GetVtn().GetColumn(), err)
+			tsl.AddError(msg)
+			// return a dummy value just to make the tree happy
+			retval = rt.NewUnnamedParamInt(0)
+		} else {
+			retval = rt.NewUnnamedParamTypeName(tn)
+		}
 	}
 	tsl.TreeProps[ctx] = retval
 }

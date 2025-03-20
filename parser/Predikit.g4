@@ -20,11 +20,21 @@ pk_group_child:
 
 pk_group_agg: PK_ALL | PK_ANY | PK_NONE;
 
-pk_test :
+pk_test:
     PK_RETRYING? PK_TEST  PK_NOT? testname=PK_ID PK_LCURLY
         aps+=pk_actual_param+
-    PK_RCURLY
+    PK_RCURLY pk_test_pred?
     ;
+
+pk_test_pred :
+    op=(PK_CMP_EQ |
+        PK_CMP_NEQ |
+        PK_CMP_RE |
+        PK_CMP_GT |
+        PK_CMP_GTE |
+        PK_CMP_LT |
+        PK_CMP_LTE)
+    pk_actual_param_value;
 
 pk_tool: PK_TOOL tool_name=PK_ID PK_LCURLY
             kids+=pk_tool_child+

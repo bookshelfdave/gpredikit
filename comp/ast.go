@@ -4,7 +4,6 @@ import (
 	rt "github.com/bookshelfdave/gpredikit/runtime"
 )
 
-
 type AstFile struct {
 	Filename string
 	Checks   []*AstChkInstance
@@ -30,15 +29,15 @@ func NewAstChkInstance() *AstChkInstance {
 }
 
 type AstToolDef struct {
-	ToolName       string
-	ClassParams    []*rt.ActualParam
-	InstanceParams map[string][]*rt.ActualParam
-	Address        rt.ContentAddress
+	ToolName         string
+	DesignTimeParams []*rt.ActualParam
+	RuntimeParams    map[string]map[string]*rt.ActualParam
+	Address          rt.ContentAddress
 }
 
 type AstToolInstanceParam struct {
 	ParamName   string
-	ParamsProps []*rt.ActualParam
+	ParamsProps map[string]*rt.ActualParam
 	Address     rt.ContentAddress
 }
 

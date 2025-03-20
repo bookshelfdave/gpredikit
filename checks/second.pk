@@ -1,0 +1,15 @@
+all {
+
+    title: "Demo the tiny set of core tests available 😀"
+    test exists? {
+        title: "Check stuff!"
+      // p(..) or path(..) allow for expansion of shell variables in a string
+       path: p( $HOME/.zshrc )
+    }
+
+
+    any {
+        test always_true { title: "Foo" }
+        test always_false { title: "Bar" }
+    }
+}

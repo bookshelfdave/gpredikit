@@ -1,0 +1,7 @@
+all {
+
+    test exists? {
+        path: "/home/dparfitt/.zshrc"
+        on_pass: "echo XXXXXXXX"
+    }
+}

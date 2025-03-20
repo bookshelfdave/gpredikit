@@ -25,6 +25,9 @@ type PredikitListener interface {
 	// EnterPk_test is called when entering the pk_test production.
 	EnterPk_test(c *Pk_testContext)
 
+	// EnterPk_test_pred is called when entering the pk_test_pred production.
+	EnterPk_test_pred(c *Pk_test_predContext)
+
 	// EnterPk_tool is called when entering the pk_tool production.
 	EnterPk_tool(c *Pk_toolContext)
 
@@ -69,6 +72,9 @@ type PredikitListener interface {
 
 	// ExitPk_test is called when exiting the pk_test production.
 	ExitPk_test(c *Pk_testContext)
+
+	// ExitPk_test_pred is called when exiting the pk_test_pred production.
+	ExitPk_test_pred(c *Pk_test_predContext)
 
 	// ExitPk_tool is called when exiting the pk_tool production.
 	ExitPk_tool(c *Pk_toolContext)

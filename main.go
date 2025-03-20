@@ -1,17 +1,41 @@
 package main
 
 import (
-	"github.com/bookshelfdave/gpredikit/comp"
-	rt "github.com/bookshelfdave/gpredikit/runtime"
+	"context"
+	"fmt"
+	"log"
+	"os"
+
+	//"github.com/bookshelfdave/gpredikit/cli"
+	"github.com/bookshelfdave/gpredikit/commands"
+	"github.com/urfave/cli/v3"
 )
 
 func main() {
-	files := []string{"./checks/first.pk"}
-	// TODO: move all error reporting up to the top level
-	compiledFilesOut := comp.CompileInputFiles(files)
-	if compiledFilesOut == nil {
-		return
+
+	cmd := &cli.Command{
+		Name:  "predikit",
+		Usage: "A simple systems testing language",
+		Action: func(context.Context, *cli.Command) error {
+			fmt.Println("Nothing to do.")
+			fmt.Println("Run predikit -h for more info")
+			return nil
+		},
+		Commands: []*cli.Command{
+			commands.RunCommand(),
+			{
+				Name:    "parse",
+				Aliases: []string{"p"},
+				Usage:   "Parse input files without running tests",
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					fmt.Println("added task: ", cmd.Args().First())
+					return nil
+				},
+			},
+		},
 	}
-	of := rt.NewDefaultOutputFormatter()
-	comp.RunChecks(compiledFilesOut, of)
+
+	if err := cmd.Run(context.Background(), os.Args); err != nil {
+		log.Fatal(err)
+	}
 }

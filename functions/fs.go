@@ -85,7 +85,7 @@ func defOnPath() *rt.ChkDef {
 			}
 		},
 		FormalParams: rt.BuildFormalParams().
-			WithRequiredString("cmd").
+			WithRequiredString("path").
 			Build(),
 		IsGroup: false,
 	}

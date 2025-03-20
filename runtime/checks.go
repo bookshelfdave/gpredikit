@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"fmt"
-	"log/slog"
+	"os/exec"
 
 	"github.com/logrusorgru/aurora/v4"
 )
@@ -14,6 +14,7 @@ type OutputFormatter interface {
 	Term()
 }
 
+// TODO: this code is pretty horrible, clean it up, ok?
 type DefaultOutputFormatter struct {
 	au *aurora.Aurora
 }
@@ -27,22 +28,44 @@ func NewDefaultOutputFormatter() DefaultOutputFormatter {
 func (f DefaultOutputFormatter) Init() {
 }
 
-func (f DefaultOutputFormatter) CheckStart(cd *ChkInstance) {
-	fmt.Printf("Starting check %s: ", cd.Name)
+func (f DefaultOutputFormatter) CheckStart(ci *ChkInstance) {
+
+	i := 0
+	for tmp := ci.Parent; tmp != nil; tmp = tmp.Parent {
+		i += 1
+		fmt.Printf("   ")
+	}
+
+	fmt.Printf("- Check %s: ", ci.BuildPath())
+
+	if len(ci.Children) > 0 {
+		fmt.Println("")
+	}
+
 }
 
-func (f DefaultOutputFormatter) CheckEnd(cd *ChkInstance) {
+func (f DefaultOutputFormatter) CheckEnd(ci *ChkInstance) {
+	if len(ci.Children) > 0 {
+		i := 0
+		for tmp := ci.Parent; tmp != nil; tmp = tmp.Parent {
+			i += 1
+			fmt.Printf("   ")
+		}
+		fmt.Printf("- Group result %s: ", ci.BuildPath())
+	}
 
-	if cd.Result.Err != nil {
-		fmt.Printf("error %+v", cd.Result.Err)
+	if ci.Result.Err != nil {
+		err := fmt.Sprintf("error %+v", ci.Result.Err)
+		fmt.Println(f.au.Yellow(err))
 	} else {
-		if cd.Result.PassFail {
+		if ci.Result.PassFail {
 			fmt.Println(f.au.Green("PASS"))
 		} else {
 			fmt.Println(f.au.Red("FAIL"))
 
 		}
 	}
+
 }
 
 func (f DefaultOutputFormatter) Term() {
@@ -148,11 +171,32 @@ func (inst *ChkInstance) Run(runEnv *RunEnv) *ChkResult {
 	return inst.Def.CheckFunction(inst.ActualParams, runEnv, inst)
 }
 
+func (inst *ChkInstance) RunHookIfDefined(hook_name string, runEnv *RunEnv) error {
+	if hook_ap, ok := inst.ActualParams.Get(hook_name); ok {
+		hook_cmdline, err := hook_ap.GetString()
+		if err != nil {
+			return fmt.Errorf("non-string value passed for hook %s: %w", hook_name, err)
+		}
+
+		// TODO: add hook timeouts?
+		// TODO: make shell configurable
+		//if err := exec.CommandContext(ctx, "bash", "-c", hook_cmdline).Run(); err != nil {
+		out, err := exec.Command("bash", "-c", hook_cmdline).Output()
+		if err != nil {
+			fmt.Printf("Hook err %s\n", err)
+		} else {
+			fmt.Printf("%s", out)
+		}
+	}
+	return nil
+}
+
 func (inst *ChkInstance) GetTitle() (string, bool) {
 	if t, ok := inst.ActualParams.Get("title"); ok {
 		if ts, err := t.GetString(); err != nil {
-			slog.Warn("Type error while getting 'title' for %s at file %s %d:%d", inst.Name, inst.Address.Filename,
-				inst.Address.Line, inst.Address.Col)
+			// I suspect that I'm not using this correctly
+			fmt.Printf("Warning: Type error while getting 'title' for %s at file %s %d:%d",
+				inst.Name, inst.Address.Filename, inst.Address.Line, inst.Address.Col)
 			return "", false
 		} else {
 			return ts, true

@@ -45,63 +45,66 @@ func predikitParserInit() {
 	}
 	staticData.RuleNames = []string{
 		"pk_toplevel", "pk_toplevel_child", "pk_group", "pk_group_child", "pk_group_agg",
-		"pk_test", "pk_tool", "pk_tool_child", "pk_tool_metaparam", "pk_actual_param",
-		"pk_actual_param_value", "pk_tool_actual_param", "pk_tool_actual_param_value",
-		"pk_conversion_fn", "pk_bool",
+		"pk_test", "pk_test_pred", "pk_tool", "pk_tool_child", "pk_tool_metaparam",
+		"pk_actual_param", "pk_actual_param_value", "pk_tool_actual_param",
+		"pk_tool_actual_param_value", "pk_conversion_fn", "pk_bool",
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 30, 123, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 30, 130, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 2, 6, 7, 6, 2, 7, 7, 7, 2, 8, 7, 8, 2, 9, 7, 9, 2, 10, 7,
-		10, 2, 11, 7, 11, 2, 12, 7, 12, 2, 13, 7, 13, 2, 14, 7, 14, 1, 0, 4, 0,
-		32, 8, 0, 11, 0, 12, 0, 33, 1, 1, 1, 1, 1, 1, 3, 1, 39, 8, 1, 1, 2, 1,
-		2, 1, 2, 4, 2, 44, 8, 2, 11, 2, 12, 2, 45, 1, 2, 1, 2, 1, 3, 1, 3, 1, 3,
-		3, 3, 53, 8, 3, 1, 4, 1, 4, 1, 5, 3, 5, 58, 8, 5, 1, 5, 1, 5, 3, 5, 62,
-		8, 5, 1, 5, 1, 5, 1, 5, 4, 5, 67, 8, 5, 11, 5, 12, 5, 68, 1, 5, 1, 5, 1,
-		6, 1, 6, 1, 6, 1, 6, 4, 6, 77, 8, 6, 11, 6, 12, 6, 78, 1, 6, 1, 6, 1, 7,
-		1, 7, 3, 7, 85, 8, 7, 1, 8, 1, 8, 1, 8, 1, 8, 4, 8, 91, 8, 8, 11, 8, 12,
-		8, 92, 1, 8, 1, 8, 1, 9, 1, 9, 1, 9, 1, 9, 1, 10, 1, 10, 1, 10, 1, 10,
-		3, 10, 105, 8, 10, 1, 11, 1, 11, 1, 11, 1, 11, 1, 12, 1, 12, 1, 12, 1,
-		12, 1, 12, 3, 12, 116, 8, 12, 1, 13, 1, 13, 1, 13, 1, 14, 1, 14, 1, 14,
-		0, 0, 15, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 0, 2,
-		1, 0, 1, 3, 1, 0, 14, 15, 126, 0, 31, 1, 0, 0, 0, 2, 38, 1, 0, 0, 0, 4,
-		40, 1, 0, 0, 0, 6, 52, 1, 0, 0, 0, 8, 54, 1, 0, 0, 0, 10, 57, 1, 0, 0,
-		0, 12, 72, 1, 0, 0, 0, 14, 84, 1, 0, 0, 0, 16, 86, 1, 0, 0, 0, 18, 96,
-		1, 0, 0, 0, 20, 104, 1, 0, 0, 0, 22, 106, 1, 0, 0, 0, 24, 115, 1, 0, 0,
-		0, 26, 117, 1, 0, 0, 0, 28, 120, 1, 0, 0, 0, 30, 32, 3, 2, 1, 0, 31, 30,
-		1, 0, 0, 0, 32, 33, 1, 0, 0, 0, 33, 31, 1, 0, 0, 0, 33, 34, 1, 0, 0, 0,
-		34, 1, 1, 0, 0, 0, 35, 39, 3, 4, 2, 0, 36, 39, 3, 10, 5, 0, 37, 39, 3,
-		12, 6, 0, 38, 35, 1, 0, 0, 0, 38, 36, 1, 0, 0, 0, 38, 37, 1, 0, 0, 0, 39,
-		3, 1, 0, 0, 0, 40, 41, 3, 8, 4, 0, 41, 43, 5, 10, 0, 0, 42, 44, 3, 6, 3,
-		0, 43, 42, 1, 0, 0, 0, 44, 45, 1, 0, 0, 0, 45, 43, 1, 0, 0, 0, 45, 46,
-		1, 0, 0, 0, 46, 47, 1, 0, 0, 0, 47, 48, 5, 11, 0, 0, 48, 5, 1, 0, 0, 0,
-		49, 53, 3, 10, 5, 0, 50, 53, 3, 4, 2, 0, 51, 53, 3, 18, 9, 0, 52, 49, 1,
-		0, 0, 0, 52, 50, 1, 0, 0, 0, 52, 51, 1, 0, 0, 0, 53, 7, 1, 0, 0, 0, 54,
-		55, 7, 0, 0, 0, 55, 9, 1, 0, 0, 0, 56, 58, 5, 7, 0, 0, 57, 56, 1, 0, 0,
-		0, 57, 58, 1, 0, 0, 0, 58, 59, 1, 0, 0, 0, 59, 61, 5, 4, 0, 0, 60, 62,
-		5, 5, 0, 0, 61, 60, 1, 0, 0, 0, 61, 62, 1, 0, 0, 0, 62, 63, 1, 0, 0, 0,
-		63, 64, 5, 25, 0, 0, 64, 66, 5, 10, 0, 0, 65, 67, 3, 18, 9, 0, 66, 65,
-		1, 0, 0, 0, 67, 68, 1, 0, 0, 0, 68, 66, 1, 0, 0, 0, 68, 69, 1, 0, 0, 0,
-		69, 70, 1, 0, 0, 0, 70, 71, 5, 11, 0, 0, 71, 11, 1, 0, 0, 0, 72, 73, 5,
-		6, 0, 0, 73, 74, 5, 25, 0, 0, 74, 76, 5, 10, 0, 0, 75, 77, 3, 14, 7, 0,
-		76, 75, 1, 0, 0, 0, 77, 78, 1, 0, 0, 0, 78, 76, 1, 0, 0, 0, 78, 79, 1,
-		0, 0, 0, 79, 80, 1, 0, 0, 0, 80, 81, 5, 11, 0, 0, 81, 13, 1, 0, 0, 0, 82,
-		85, 3, 18, 9, 0, 83, 85, 3, 16, 8, 0, 84, 82, 1, 0, 0, 0, 84, 83, 1, 0,
-		0, 0, 85, 15, 1, 0, 0, 0, 86, 87, 5, 9, 0, 0, 87, 88, 5, 25, 0, 0, 88,
-		90, 5, 10, 0, 0, 89, 91, 3, 22, 11, 0, 90, 89, 1, 0, 0, 0, 91, 92, 1, 0,
-		0, 0, 92, 90, 1, 0, 0, 0, 92, 93, 1, 0, 0, 0, 93, 94, 1, 0, 0, 0, 94, 95,
-		5, 11, 0, 0, 95, 17, 1, 0, 0, 0, 96, 97, 5, 25, 0, 0, 97, 98, 5, 8, 0,
-		0, 98, 99, 3, 20, 10, 0, 99, 19, 1, 0, 0, 0, 100, 105, 5, 27, 0, 0, 101,
-		105, 5, 24, 0, 0, 102, 105, 3, 28, 14, 0, 103, 105, 3, 26, 13, 0, 104,
-		100, 1, 0, 0, 0, 104, 101, 1, 0, 0, 0, 104, 102, 1, 0, 0, 0, 104, 103,
-		1, 0, 0, 0, 105, 21, 1, 0, 0, 0, 106, 107, 5, 25, 0, 0, 107, 108, 5, 8,
-		0, 0, 108, 109, 3, 24, 12, 0, 109, 23, 1, 0, 0, 0, 110, 116, 5, 27, 0,
-		0, 111, 116, 5, 24, 0, 0, 112, 116, 3, 28, 14, 0, 113, 116, 3, 26, 13,
-		0, 114, 116, 5, 26, 0, 0, 115, 110, 1, 0, 0, 0, 115, 111, 1, 0, 0, 0, 115,
-		112, 1, 0, 0, 0, 115, 113, 1, 0, 0, 0, 115, 114, 1, 0, 0, 0, 116, 25, 1,
-		0, 0, 0, 117, 118, 5, 25, 0, 0, 118, 119, 5, 23, 0, 0, 119, 27, 1, 0, 0,
-		0, 120, 121, 7, 1, 0, 0, 121, 29, 1, 0, 0, 0, 12, 33, 38, 45, 52, 57, 61,
-		68, 78, 84, 92, 104, 115,
+		10, 2, 11, 7, 11, 2, 12, 7, 12, 2, 13, 7, 13, 2, 14, 7, 14, 2, 15, 7, 15,
+		1, 0, 4, 0, 34, 8, 0, 11, 0, 12, 0, 35, 1, 1, 1, 1, 1, 1, 3, 1, 41, 8,
+		1, 1, 2, 1, 2, 1, 2, 4, 2, 46, 8, 2, 11, 2, 12, 2, 47, 1, 2, 1, 2, 1, 3,
+		1, 3, 1, 3, 3, 3, 55, 8, 3, 1, 4, 1, 4, 1, 5, 3, 5, 60, 8, 5, 1, 5, 1,
+		5, 3, 5, 64, 8, 5, 1, 5, 1, 5, 1, 5, 4, 5, 69, 8, 5, 11, 5, 12, 5, 70,
+		1, 5, 1, 5, 3, 5, 75, 8, 5, 1, 6, 1, 6, 1, 6, 1, 7, 1, 7, 1, 7, 1, 7, 4,
+		7, 84, 8, 7, 11, 7, 12, 7, 85, 1, 7, 1, 7, 1, 8, 1, 8, 3, 8, 92, 8, 8,
+		1, 9, 1, 9, 1, 9, 1, 9, 4, 9, 98, 8, 9, 11, 9, 12, 9, 99, 1, 9, 1, 9, 1,
+		10, 1, 10, 1, 10, 1, 10, 1, 11, 1, 11, 1, 11, 1, 11, 3, 11, 112, 8, 11,
+		1, 12, 1, 12, 1, 12, 1, 12, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 3, 13, 123,
+		8, 13, 1, 14, 1, 14, 1, 14, 1, 15, 1, 15, 1, 15, 0, 0, 16, 0, 2, 4, 6,
+		8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 0, 3, 1, 0, 1, 3, 1, 0,
+		16, 22, 1, 0, 14, 15, 133, 0, 33, 1, 0, 0, 0, 2, 40, 1, 0, 0, 0, 4, 42,
+		1, 0, 0, 0, 6, 54, 1, 0, 0, 0, 8, 56, 1, 0, 0, 0, 10, 59, 1, 0, 0, 0, 12,
+		76, 1, 0, 0, 0, 14, 79, 1, 0, 0, 0, 16, 91, 1, 0, 0, 0, 18, 93, 1, 0, 0,
+		0, 20, 103, 1, 0, 0, 0, 22, 111, 1, 0, 0, 0, 24, 113, 1, 0, 0, 0, 26, 122,
+		1, 0, 0, 0, 28, 124, 1, 0, 0, 0, 30, 127, 1, 0, 0, 0, 32, 34, 3, 2, 1,
+		0, 33, 32, 1, 0, 0, 0, 34, 35, 1, 0, 0, 0, 35, 33, 1, 0, 0, 0, 35, 36,
+		1, 0, 0, 0, 36, 1, 1, 0, 0, 0, 37, 41, 3, 4, 2, 0, 38, 41, 3, 10, 5, 0,
+		39, 41, 3, 14, 7, 0, 40, 37, 1, 0, 0, 0, 40, 38, 1, 0, 0, 0, 40, 39, 1,
+		0, 0, 0, 41, 3, 1, 0, 0, 0, 42, 43, 3, 8, 4, 0, 43, 45, 5, 10, 0, 0, 44,
+		46, 3, 6, 3, 0, 45, 44, 1, 0, 0, 0, 46, 47, 1, 0, 0, 0, 47, 45, 1, 0, 0,
+		0, 47, 48, 1, 0, 0, 0, 48, 49, 1, 0, 0, 0, 49, 50, 5, 11, 0, 0, 50, 5,
+		1, 0, 0, 0, 51, 55, 3, 10, 5, 0, 52, 55, 3, 4, 2, 0, 53, 55, 3, 20, 10,
+		0, 54, 51, 1, 0, 0, 0, 54, 52, 1, 0, 0, 0, 54, 53, 1, 0, 0, 0, 55, 7, 1,
+		0, 0, 0, 56, 57, 7, 0, 0, 0, 57, 9, 1, 0, 0, 0, 58, 60, 5, 7, 0, 0, 59,
+		58, 1, 0, 0, 0, 59, 60, 1, 0, 0, 0, 60, 61, 1, 0, 0, 0, 61, 63, 5, 4, 0,
+		0, 62, 64, 5, 5, 0, 0, 63, 62, 1, 0, 0, 0, 63, 64, 1, 0, 0, 0, 64, 65,
+		1, 0, 0, 0, 65, 66, 5, 25, 0, 0, 66, 68, 5, 10, 0, 0, 67, 69, 3, 20, 10,
+		0, 68, 67, 1, 0, 0, 0, 69, 70, 1, 0, 0, 0, 70, 68, 1, 0, 0, 0, 70, 71,
+		1, 0, 0, 0, 71, 72, 1, 0, 0, 0, 72, 74, 5, 11, 0, 0, 73, 75, 3, 12, 6,
+		0, 74, 73, 1, 0, 0, 0, 74, 75, 1, 0, 0, 0, 75, 11, 1, 0, 0, 0, 76, 77,
+		7, 1, 0, 0, 77, 78, 3, 22, 11, 0, 78, 13, 1, 0, 0, 0, 79, 80, 5, 6, 0,
+		0, 80, 81, 5, 25, 0, 0, 81, 83, 5, 10, 0, 0, 82, 84, 3, 16, 8, 0, 83, 82,
+		1, 0, 0, 0, 84, 85, 1, 0, 0, 0, 85, 83, 1, 0, 0, 0, 85, 86, 1, 0, 0, 0,
+		86, 87, 1, 0, 0, 0, 87, 88, 5, 11, 0, 0, 88, 15, 1, 0, 0, 0, 89, 92, 3,
+		20, 10, 0, 90, 92, 3, 18, 9, 0, 91, 89, 1, 0, 0, 0, 91, 90, 1, 0, 0, 0,
+		92, 17, 1, 0, 0, 0, 93, 94, 5, 9, 0, 0, 94, 95, 5, 25, 0, 0, 95, 97, 5,
+		10, 0, 0, 96, 98, 3, 24, 12, 0, 97, 96, 1, 0, 0, 0, 98, 99, 1, 0, 0, 0,
+		99, 97, 1, 0, 0, 0, 99, 100, 1, 0, 0, 0, 100, 101, 1, 0, 0, 0, 101, 102,
+		5, 11, 0, 0, 102, 19, 1, 0, 0, 0, 103, 104, 5, 25, 0, 0, 104, 105, 5, 8,
+		0, 0, 105, 106, 3, 22, 11, 0, 106, 21, 1, 0, 0, 0, 107, 112, 5, 27, 0,
+		0, 108, 112, 5, 24, 0, 0, 109, 112, 3, 30, 15, 0, 110, 112, 3, 28, 14,
+		0, 111, 107, 1, 0, 0, 0, 111, 108, 1, 0, 0, 0, 111, 109, 1, 0, 0, 0, 111,
+		110, 1, 0, 0, 0, 112, 23, 1, 0, 0, 0, 113, 114, 5, 25, 0, 0, 114, 115,
+		5, 8, 0, 0, 115, 116, 3, 26, 13, 0, 116, 25, 1, 0, 0, 0, 117, 123, 5, 27,
+		0, 0, 118, 123, 5, 24, 0, 0, 119, 123, 3, 30, 15, 0, 120, 123, 3, 28, 14,
+		0, 121, 123, 5, 26, 0, 0, 122, 117, 1, 0, 0, 0, 122, 118, 1, 0, 0, 0, 122,
+		119, 1, 0, 0, 0, 122, 120, 1, 0, 0, 0, 122, 121, 1, 0, 0, 0, 123, 27, 1,
+		0, 0, 0, 124, 125, 5, 25, 0, 0, 125, 126, 5, 23, 0, 0, 126, 29, 1, 0, 0,
+		0, 127, 128, 7, 2, 0, 0, 128, 31, 1, 0, 0, 0, 13, 35, 40, 47, 54, 59, 63,
+		70, 74, 85, 91, 99, 111, 122,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -180,15 +183,16 @@ const (
 	PredikitParserRULE_pk_group_child             = 3
 	PredikitParserRULE_pk_group_agg               = 4
 	PredikitParserRULE_pk_test                    = 5
-	PredikitParserRULE_pk_tool                    = 6
-	PredikitParserRULE_pk_tool_child              = 7
-	PredikitParserRULE_pk_tool_metaparam          = 8
-	PredikitParserRULE_pk_actual_param            = 9
-	PredikitParserRULE_pk_actual_param_value      = 10
-	PredikitParserRULE_pk_tool_actual_param       = 11
-	PredikitParserRULE_pk_tool_actual_param_value = 12
-	PredikitParserRULE_pk_conversion_fn           = 13
-	PredikitParserRULE_pk_bool                    = 14
+	PredikitParserRULE_pk_test_pred               = 6
+	PredikitParserRULE_pk_tool                    = 7
+	PredikitParserRULE_pk_tool_child              = 8
+	PredikitParserRULE_pk_tool_metaparam          = 9
+	PredikitParserRULE_pk_actual_param            = 10
+	PredikitParserRULE_pk_actual_param_value      = 11
+	PredikitParserRULE_pk_tool_actual_param       = 12
+	PredikitParserRULE_pk_tool_actual_param_value = 13
+	PredikitParserRULE_pk_conversion_fn           = 14
+	PredikitParserRULE_pk_bool                    = 15
 )
 
 // IPk_toplevelContext is an interface to support dynamic dispatch.
@@ -331,7 +335,7 @@ func (p *PredikitParser) Pk_toplevel() (localctx IPk_toplevelContext) {
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(31)
+	p.SetState(33)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -340,7 +344,7 @@ func (p *PredikitParser) Pk_toplevel() (localctx IPk_toplevelContext) {
 
 	for ok := true; ok; ok = ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&222) != 0) {
 		{
-			p.SetState(30)
+			p.SetState(32)
 
 			var _x = p.Pk_toplevel_child()
 
@@ -348,7 +352,7 @@ func (p *PredikitParser) Pk_toplevel() (localctx IPk_toplevelContext) {
 		}
 		localctx.(*Pk_toplevelContext).kids = append(localctx.(*Pk_toplevelContext).kids, localctx.(*Pk_toplevelContext)._pk_toplevel_child)
 
-		p.SetState(33)
+		p.SetState(35)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -521,7 +525,7 @@ func (s *Pk_toplevel_childContext) ExitRule(listener antlr.ParseTreeListener) {
 func (p *PredikitParser) Pk_toplevel_child() (localctx IPk_toplevel_childContext) {
 	localctx = NewPk_toplevel_childContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 2, PredikitParserRULE_pk_toplevel_child)
-	p.SetState(38)
+	p.SetState(40)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -531,7 +535,7 @@ func (p *PredikitParser) Pk_toplevel_child() (localctx IPk_toplevel_childContext
 	case PredikitParserPK_ALL, PredikitParserPK_ANY, PredikitParserPK_NONE:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(35)
+			p.SetState(37)
 
 			var _x = p.Pk_group()
 
@@ -541,7 +545,7 @@ func (p *PredikitParser) Pk_toplevel_child() (localctx IPk_toplevel_childContext
 	case PredikitParserPK_TEST, PredikitParserPK_RETRYING:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(36)
+			p.SetState(38)
 
 			var _x = p.Pk_test()
 
@@ -551,7 +555,7 @@ func (p *PredikitParser) Pk_toplevel_child() (localctx IPk_toplevel_childContext
 	case PredikitParserPK_TOOL:
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(37)
+			p.SetState(39)
 
 			var _x = p.Pk_tool()
 
@@ -751,21 +755,21 @@ func (p *PredikitParser) Pk_group() (localctx IPk_groupContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(40)
+		p.SetState(42)
 
 		var _x = p.Pk_group_agg()
 
 		localctx.(*Pk_groupContext).agg_fn = _x
 	}
 	{
-		p.SetState(41)
+		p.SetState(43)
 		p.Match(PredikitParserPK_LCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(43)
+	p.SetState(45)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -774,7 +778,7 @@ func (p *PredikitParser) Pk_group() (localctx IPk_groupContext) {
 
 	for ok := true; ok; ok = ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&33554590) != 0) {
 		{
-			p.SetState(42)
+			p.SetState(44)
 
 			var _x = p.Pk_group_child()
 
@@ -782,7 +786,7 @@ func (p *PredikitParser) Pk_group() (localctx IPk_groupContext) {
 		}
 		localctx.(*Pk_groupContext).group_children = append(localctx.(*Pk_groupContext).group_children, localctx.(*Pk_groupContext)._pk_group_child)
 
-		p.SetState(45)
+		p.SetState(47)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -790,7 +794,7 @@ func (p *PredikitParser) Pk_group() (localctx IPk_groupContext) {
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(47)
+		p.SetState(49)
 		p.Match(PredikitParserPK_RCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -963,7 +967,7 @@ func (s *Pk_group_childContext) ExitRule(listener antlr.ParseTreeListener) {
 func (p *PredikitParser) Pk_group_child() (localctx IPk_group_childContext) {
 	localctx = NewPk_group_childContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 6, PredikitParserRULE_pk_group_child)
-	p.SetState(52)
+	p.SetState(54)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -973,7 +977,7 @@ func (p *PredikitParser) Pk_group_child() (localctx IPk_group_childContext) {
 	case PredikitParserPK_TEST, PredikitParserPK_RETRYING:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(49)
+			p.SetState(51)
 
 			var _x = p.Pk_test()
 
@@ -983,7 +987,7 @@ func (p *PredikitParser) Pk_group_child() (localctx IPk_group_childContext) {
 	case PredikitParserPK_ALL, PredikitParserPK_ANY, PredikitParserPK_NONE:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(50)
+			p.SetState(52)
 
 			var _x = p.Pk_group()
 
@@ -993,7 +997,7 @@ func (p *PredikitParser) Pk_group_child() (localctx IPk_group_childContext) {
 	case PredikitParserPK_ID:
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(51)
+			p.SetState(53)
 
 			var _x = p.Pk_actual_param()
 
@@ -1105,7 +1109,7 @@ func (p *PredikitParser) Pk_group_agg() (localctx IPk_group_aggContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(54)
+		p.SetState(56)
 		_la = p.GetTokenStream().LA(1)
 
 		if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&14) != 0) {
@@ -1161,6 +1165,7 @@ type IPk_testContext interface {
 	PK_ID() antlr.TerminalNode
 	PK_RETRYING() antlr.TerminalNode
 	PK_NOT() antlr.TerminalNode
+	Pk_test_pred() IPk_test_predContext
 	AllPk_actual_param() []IPk_actual_paramContext
 	Pk_actual_param(i int) IPk_actual_paramContext
 
@@ -1239,6 +1244,22 @@ func (s *Pk_testContext) PK_NOT() antlr.TerminalNode {
 	return s.GetToken(PredikitParserPK_NOT, 0)
 }
 
+func (s *Pk_testContext) Pk_test_pred() IPk_test_predContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IPk_test_predContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IPk_test_predContext)
+}
+
 func (s *Pk_testContext) AllPk_actual_param() []IPk_actual_paramContext {
 	children := s.GetChildren()
 	len := 0
@@ -1306,7 +1327,7 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(57)
+	p.SetState(59)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1315,7 +1336,7 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 
 	if _la == PredikitParserPK_RETRYING {
 		{
-			p.SetState(56)
+			p.SetState(58)
 			p.Match(PredikitParserPK_RETRYING)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1325,14 +1346,14 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 
 	}
 	{
-		p.SetState(59)
+		p.SetState(61)
 		p.Match(PredikitParserPK_TEST)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(61)
+	p.SetState(63)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1341,7 +1362,7 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 
 	if _la == PredikitParserPK_NOT {
 		{
-			p.SetState(60)
+			p.SetState(62)
 			p.Match(PredikitParserPK_NOT)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1351,7 +1372,7 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 
 	}
 	{
-		p.SetState(63)
+		p.SetState(65)
 
 		var _m = p.Match(PredikitParserPK_ID)
 
@@ -1362,14 +1383,14 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 		}
 	}
 	{
-		p.SetState(64)
+		p.SetState(66)
 		p.Match(PredikitParserPK_LCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(66)
+	p.SetState(68)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1378,7 +1399,7 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 
 	for ok := true; ok; ok = _la == PredikitParserPK_ID {
 		{
-			p.SetState(65)
+			p.SetState(67)
 
 			var _x = p.Pk_actual_param()
 
@@ -1386,7 +1407,7 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 		}
 		localctx.(*Pk_testContext).aps = append(localctx.(*Pk_testContext).aps, localctx.(*Pk_testContext)._pk_actual_param)
 
-		p.SetState(68)
+		p.SetState(70)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -1394,12 +1415,196 @@ func (p *PredikitParser) Pk_test() (localctx IPk_testContext) {
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(70)
+		p.SetState(72)
 		p.Match(PredikitParserPK_RCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
+	}
+	p.SetState(74)
+	p.GetErrorHandler().Sync(p)
+	if p.HasError() {
+		goto errorExit
+	}
+	_la = p.GetTokenStream().LA(1)
+
+	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&8323072) != 0 {
+		{
+			p.SetState(73)
+			p.Pk_test_pred()
+		}
+
+	}
+
+errorExit:
+	if p.HasError() {
+		v := p.GetError()
+		localctx.SetException(v)
+		p.GetErrorHandler().ReportError(p, v)
+		p.GetErrorHandler().Recover(p, v)
+		p.SetError(nil)
+	}
+	p.ExitRule()
+	return localctx
+	goto errorExit // Trick to prevent compiler error if the label is not used
+}
+
+// IPk_test_predContext is an interface to support dynamic dispatch.
+type IPk_test_predContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// GetOp returns the op token.
+	GetOp() antlr.Token
+
+	// SetOp sets the op token.
+	SetOp(antlr.Token)
+
+	// Getter signatures
+	Pk_actual_param_value() IPk_actual_param_valueContext
+	PK_CMP_EQ() antlr.TerminalNode
+	PK_CMP_NEQ() antlr.TerminalNode
+	PK_CMP_RE() antlr.TerminalNode
+	PK_CMP_GT() antlr.TerminalNode
+	PK_CMP_GTE() antlr.TerminalNode
+	PK_CMP_LT() antlr.TerminalNode
+	PK_CMP_LTE() antlr.TerminalNode
+
+	// IsPk_test_predContext differentiates from other interfaces.
+	IsPk_test_predContext()
+}
+
+type Pk_test_predContext struct {
+	antlr.BaseParserRuleContext
+	parser antlr.Parser
+	op     antlr.Token
+}
+
+func NewEmptyPk_test_predContext() *Pk_test_predContext {
+	var p = new(Pk_test_predContext)
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	p.RuleIndex = PredikitParserRULE_pk_test_pred
+	return p
+}
+
+func InitEmptyPk_test_predContext(p *Pk_test_predContext) {
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	p.RuleIndex = PredikitParserRULE_pk_test_pred
+}
+
+func (*Pk_test_predContext) IsPk_test_predContext() {}
+
+func NewPk_test_predContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Pk_test_predContext {
+	var p = new(Pk_test_predContext)
+
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = PredikitParserRULE_pk_test_pred
+
+	return p
+}
+
+func (s *Pk_test_predContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Pk_test_predContext) GetOp() antlr.Token { return s.op }
+
+func (s *Pk_test_predContext) SetOp(v antlr.Token) { s.op = v }
+
+func (s *Pk_test_predContext) Pk_actual_param_value() IPk_actual_param_valueContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IPk_actual_param_valueContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IPk_actual_param_valueContext)
+}
+
+func (s *Pk_test_predContext) PK_CMP_EQ() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_CMP_EQ, 0)
+}
+
+func (s *Pk_test_predContext) PK_CMP_NEQ() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_CMP_NEQ, 0)
+}
+
+func (s *Pk_test_predContext) PK_CMP_RE() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_CMP_RE, 0)
+}
+
+func (s *Pk_test_predContext) PK_CMP_GT() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_CMP_GT, 0)
+}
+
+func (s *Pk_test_predContext) PK_CMP_GTE() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_CMP_GTE, 0)
+}
+
+func (s *Pk_test_predContext) PK_CMP_LT() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_CMP_LT, 0)
+}
+
+func (s *Pk_test_predContext) PK_CMP_LTE() antlr.TerminalNode {
+	return s.GetToken(PredikitParserPK_CMP_LTE, 0)
+}
+
+func (s *Pk_test_predContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *Pk_test_predContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *Pk_test_predContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(PredikitListener); ok {
+		listenerT.EnterPk_test_pred(s)
+	}
+}
+
+func (s *Pk_test_predContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(PredikitListener); ok {
+		listenerT.ExitPk_test_pred(s)
+	}
+}
+
+func (p *PredikitParser) Pk_test_pred() (localctx IPk_test_predContext) {
+	localctx = NewPk_test_predContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 12, PredikitParserRULE_pk_test_pred)
+	var _la int
+
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(76)
+
+		var _lt = p.GetTokenStream().LT(1)
+
+		localctx.(*Pk_test_predContext).op = _lt
+
+		_la = p.GetTokenStream().LA(1)
+
+		if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&8323072) != 0) {
+			var _ri = p.GetErrorHandler().RecoverInline(p)
+
+			localctx.(*Pk_test_predContext).op = _ri
+		} else {
+			p.GetErrorHandler().ReportMatch(p)
+			p.Consume()
+		}
+	}
+	{
+		p.SetState(77)
+		p.Pk_actual_param_value()
 	}
 
 errorExit:
@@ -1578,12 +1783,12 @@ func (s *Pk_toolContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *PredikitParser) Pk_tool() (localctx IPk_toolContext) {
 	localctx = NewPk_toolContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 12, PredikitParserRULE_pk_tool)
+	p.EnterRule(localctx, 14, PredikitParserRULE_pk_tool)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(72)
+		p.SetState(79)
 		p.Match(PredikitParserPK_TOOL)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1591,7 +1796,7 @@ func (p *PredikitParser) Pk_tool() (localctx IPk_toolContext) {
 		}
 	}
 	{
-		p.SetState(73)
+		p.SetState(80)
 
 		var _m = p.Match(PredikitParserPK_ID)
 
@@ -1602,14 +1807,14 @@ func (p *PredikitParser) Pk_tool() (localctx IPk_toolContext) {
 		}
 	}
 	{
-		p.SetState(74)
+		p.SetState(81)
 		p.Match(PredikitParserPK_LCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(76)
+	p.SetState(83)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1618,7 +1823,7 @@ func (p *PredikitParser) Pk_tool() (localctx IPk_toolContext) {
 
 	for ok := true; ok; ok = _la == PredikitParserPK_DOLLAR || _la == PredikitParserPK_ID {
 		{
-			p.SetState(75)
+			p.SetState(82)
 
 			var _x = p.Pk_tool_child()
 
@@ -1626,7 +1831,7 @@ func (p *PredikitParser) Pk_tool() (localctx IPk_toolContext) {
 		}
 		localctx.(*Pk_toolContext).kids = append(localctx.(*Pk_toolContext).kids, localctx.(*Pk_toolContext)._pk_tool_child)
 
-		p.SetState(78)
+		p.SetState(85)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -1634,7 +1839,7 @@ func (p *PredikitParser) Pk_tool() (localctx IPk_toolContext) {
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(80)
+		p.SetState(87)
 		p.Match(PredikitParserPK_RCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1756,8 +1961,8 @@ func (s *Pk_tool_childContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *PredikitParser) Pk_tool_child() (localctx IPk_tool_childContext) {
 	localctx = NewPk_tool_childContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 14, PredikitParserRULE_pk_tool_child)
-	p.SetState(84)
+	p.EnterRule(localctx, 16, PredikitParserRULE_pk_tool_child)
+	p.SetState(91)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1767,14 +1972,14 @@ func (p *PredikitParser) Pk_tool_child() (localctx IPk_tool_childContext) {
 	case PredikitParserPK_ID:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(82)
+			p.SetState(89)
 			p.Pk_actual_param()
 		}
 
 	case PredikitParserPK_DOLLAR:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(83)
+			p.SetState(90)
 			p.Pk_tool_metaparam()
 		}
 
@@ -1967,12 +2172,12 @@ func (s *Pk_tool_metaparamContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext) {
 	localctx = NewPk_tool_metaparamContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 16, PredikitParserRULE_pk_tool_metaparam)
+	p.EnterRule(localctx, 18, PredikitParserRULE_pk_tool_metaparam)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(86)
+		p.SetState(93)
 		p.Match(PredikitParserPK_DOLLAR)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1980,7 +2185,7 @@ func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext
 		}
 	}
 	{
-		p.SetState(87)
+		p.SetState(94)
 
 		var _m = p.Match(PredikitParserPK_ID)
 
@@ -1991,14 +2196,14 @@ func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext
 		}
 	}
 	{
-		p.SetState(88)
+		p.SetState(95)
 		p.Match(PredikitParserPK_LCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(90)
+	p.SetState(97)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2007,7 +2212,7 @@ func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext
 
 	for ok := true; ok; ok = _la == PredikitParserPK_ID {
 		{
-			p.SetState(89)
+			p.SetState(96)
 
 			var _x = p.Pk_tool_actual_param()
 
@@ -2015,7 +2220,7 @@ func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext
 		}
 		localctx.(*Pk_tool_metaparamContext).tool_actual_params = append(localctx.(*Pk_tool_metaparamContext).tool_actual_params, localctx.(*Pk_tool_metaparamContext)._pk_tool_actual_param)
 
-		p.SetState(92)
+		p.SetState(99)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -2023,7 +2228,7 @@ func (p *PredikitParser) Pk_tool_metaparam() (localctx IPk_tool_metaparamContext
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(94)
+		p.SetState(101)
 		p.Match(PredikitParserPK_RCURLY)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2160,10 +2365,10 @@ func (s *Pk_actual_paramContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *PredikitParser) Pk_actual_param() (localctx IPk_actual_paramContext) {
 	localctx = NewPk_actual_paramContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 18, PredikitParserRULE_pk_actual_param)
+	p.EnterRule(localctx, 20, PredikitParserRULE_pk_actual_param)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(96)
+		p.SetState(103)
 
 		var _m = p.Match(PredikitParserPK_ID)
 
@@ -2174,7 +2379,7 @@ func (p *PredikitParser) Pk_actual_param() (localctx IPk_actual_paramContext) {
 		}
 	}
 	{
-		p.SetState(97)
+		p.SetState(104)
 		p.Match(PredikitParserPK_COLON)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2182,7 +2387,7 @@ func (p *PredikitParser) Pk_actual_param() (localctx IPk_actual_paramContext) {
 		}
 	}
 	{
-		p.SetState(98)
+		p.SetState(105)
 
 		var _x = p.Pk_actual_param_value()
 
@@ -2357,8 +2562,8 @@ func (s *Pk_actual_param_valueContext) ExitRule(listener antlr.ParseTreeListener
 
 func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valueContext) {
 	localctx = NewPk_actual_param_valueContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 20, PredikitParserRULE_pk_actual_param_value)
-	p.SetState(104)
+	p.EnterRule(localctx, 22, PredikitParserRULE_pk_actual_param_value)
+	p.SetState(111)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2368,7 +2573,7 @@ func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valu
 	case PredikitParserPK_INT:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(100)
+			p.SetState(107)
 
 			var _m = p.Match(PredikitParserPK_INT)
 
@@ -2382,7 +2587,7 @@ func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valu
 	case PredikitParserPK_STRING_LIT:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(101)
+			p.SetState(108)
 
 			var _m = p.Match(PredikitParserPK_STRING_LIT)
 
@@ -2396,7 +2601,7 @@ func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valu
 	case PredikitParserPK_TRUE, PredikitParserPK_FALSE:
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(102)
+			p.SetState(109)
 
 			var _x = p.Pk_bool()
 
@@ -2406,7 +2611,7 @@ func (p *PredikitParser) Pk_actual_param_value() (localctx IPk_actual_param_valu
 	case PredikitParserPK_ID:
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(103)
+			p.SetState(110)
 
 			var _x = p.Pk_conversion_fn()
 
@@ -2551,10 +2756,10 @@ func (s *Pk_tool_actual_paramContext) ExitRule(listener antlr.ParseTreeListener)
 
 func (p *PredikitParser) Pk_tool_actual_param() (localctx IPk_tool_actual_paramContext) {
 	localctx = NewPk_tool_actual_paramContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 22, PredikitParserRULE_pk_tool_actual_param)
+	p.EnterRule(localctx, 24, PredikitParserRULE_pk_tool_actual_param)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(106)
+		p.SetState(113)
 
 		var _m = p.Match(PredikitParserPK_ID)
 
@@ -2565,7 +2770,7 @@ func (p *PredikitParser) Pk_tool_actual_param() (localctx IPk_tool_actual_paramC
 		}
 	}
 	{
-		p.SetState(107)
+		p.SetState(114)
 		p.Match(PredikitParserPK_COLON)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2573,7 +2778,7 @@ func (p *PredikitParser) Pk_tool_actual_param() (localctx IPk_tool_actual_paramC
 		}
 	}
 	{
-		p.SetState(108)
+		p.SetState(115)
 
 		var _x = p.Pk_tool_actual_param_value()
 
@@ -2764,8 +2969,8 @@ func (s *Pk_tool_actual_param_valueContext) ExitRule(listener antlr.ParseTreeLis
 
 func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_param_valueContext) {
 	localctx = NewPk_tool_actual_param_valueContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 24, PredikitParserRULE_pk_tool_actual_param_value)
-	p.SetState(115)
+	p.EnterRule(localctx, 26, PredikitParserRULE_pk_tool_actual_param_value)
+	p.SetState(122)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2775,7 +2980,7 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 	case PredikitParserPK_INT:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(110)
+			p.SetState(117)
 
 			var _m = p.Match(PredikitParserPK_INT)
 
@@ -2789,7 +2994,7 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 	case PredikitParserPK_STRING_LIT:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(111)
+			p.SetState(118)
 
 			var _m = p.Match(PredikitParserPK_STRING_LIT)
 
@@ -2803,7 +3008,7 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 	case PredikitParserPK_TRUE, PredikitParserPK_FALSE:
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(112)
+			p.SetState(119)
 
 			var _x = p.Pk_bool()
 
@@ -2813,7 +3018,7 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 	case PredikitParserPK_ID:
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(113)
+			p.SetState(120)
 
 			var _x = p.Pk_conversion_fn()
 
@@ -2823,7 +3028,7 @@ func (p *PredikitParser) Pk_tool_actual_param_value() (localctx IPk_tool_actual_
 	case PredikitParserPK_TYPENAME:
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(114)
+			p.SetState(121)
 
 			var _m = p.Match(PredikitParserPK_TYPENAME)
 
@@ -2929,10 +3134,10 @@ func (s *Pk_conversion_fnContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *PredikitParser) Pk_conversion_fn() (localctx IPk_conversion_fnContext) {
 	localctx = NewPk_conversion_fnContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 26, PredikitParserRULE_pk_conversion_fn)
+	p.EnterRule(localctx, 28, PredikitParserRULE_pk_conversion_fn)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(117)
+		p.SetState(124)
 		p.Match(PredikitParserPK_ID)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2940,7 +3145,7 @@ func (p *PredikitParser) Pk_conversion_fn() (localctx IPk_conversion_fnContext) 
 		}
 	}
 	{
-		p.SetState(118)
+		p.SetState(125)
 		p.Match(PredikitParserPK_FN_LIT)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -3038,12 +3243,12 @@ func (s *Pk_boolContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *PredikitParser) Pk_bool() (localctx IPk_boolContext) {
 	localctx = NewPk_boolContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 28, PredikitParserRULE_pk_bool)
+	p.EnterRule(localctx, 30, PredikitParserRULE_pk_bool)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(120)
+		p.SetState(127)
 		_la = p.GetTokenStream().LA(1)
 
 		if !(_la == PredikitParserPK_TRUE || _la == PredikitParserPK_FALSE) {
